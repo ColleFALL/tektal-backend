@@ -10,11 +10,12 @@ SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-key")
 DEBUG = False
 DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
 
+ALLOWED_HOSTS = ["*"]
 
-ALLOWED_HOSTS = os.environ.get(
-    "DJANGO_ALLOWED_HOSTS",
-    "127.0.0.1,localhost"
-).split(",")
+# ALLOWED_HOSTS = os.environ.get(
+#     "DJANGO_ALLOWED_HOSTS",
+#     "127.0.0.1,localhost"
+# ).split(",")
 CSRF_TRUSTED_ORIGINS = [
     "https://tektal-backend.onrender.com",
 ]
