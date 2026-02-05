@@ -6,29 +6,44 @@ import cloudinary.uploader
 import cloudinary.api
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = os.environ.get("SECRET_KEY", "dev-secret-key")
-DEBUG = True
+SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "dev-secret-key")
+DEBUG = False
+DEBUG = os.environ.get("DJANGO_DEBUG", "False") == "True"
 
-ALLOWED_HOSTS = ["*"]
+
+ALLOWED_HOSTS = os.environ.get(
+    "DJANGO_ALLOWED_HOSTS",
+    "127.0.0.1,localhost"
+).split(",")
 
 
-CLOUDINARY_STORAGE = {
-    "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME", "dxkadqzzz"),
-    "API_KEY": os.environ.get("CLOUDINARY_API_KEY", "731133196691316"),
-    "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET", "dMXw_Vg15CsscxLbW5n1s5xA16Q"),
-}
 
-cloudinary.config(
-    cloud_name=CLOUDINARY_STORAGE["CLOUD_NAME"],
-    api_key=CLOUDINARY_STORAGE["API_KEY"],
-    api_secret=CLOUDINARY_STORAGE["API_SECRET"],
-    secure=True,
-)
+# CLOUDINARY_STORAGE = {
+#     "CLOUD_NAME": os.environ.get("CLOUDINARY_CLOUD_NAME", "dxkadqzzz"),
+#     "API_KEY": os.environ.get("CLOUDINARY_API_KEY", "731133196691316"),
+#     "API_SECRET": os.environ.get("CLOUDINARY_API_SECRET", "dMXw_Vg15CsscxLbW5n1s5xA16Q"),
+# }
+
+# cloudinary.config(
+#     cloud_name=CLOUDINARY_STORAGE["CLOUD_NAME"],
+#     api_key=CLOUDINARY_STORAGE["API_KEY"],
+#     api_secret=CLOUDINARY_STORAGE["API_SECRET"],
+#     secure=True,
+# )
+CLOUDINARY_CLOUD_NAME = os.environ.get("CLOUDINARY_CLOUD_NAME")
+CLOUDINARY_API_KEY = os.environ.get("CLOUDINARY_API_KEY")
+CLOUDINARY_API_SECRET = os.environ.get("CLOUDINARY_API_SECRET")
+
+if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
+    cloudinary.config(
+        cloud_name=CLOUDINARY_CLOUD_NAME,
+        api_key=CLOUDINARY_API_KEY,
+        api_secret=CLOUDINARY_API_SECRET,
+        secure=True,
+    )
+
 
 DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-
-
-# =========================
 # APPS
 # =========================
 INSTALLED_APPS = [
@@ -41,7 +56,9 @@ INSTALLED_APPS = [
 
     # ton app auth
     "accounts",
-
+      
+      "cloudinary",
+      "cloudinary_storage",
     # tiers
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
