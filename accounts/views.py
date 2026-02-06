@@ -5,6 +5,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.response import Response
 from .models import PasswordResetToken
 from .serializers import RegisterSerializer, UserSerializer
+from django.shortcuts import render
+from django.http import JsonResponse
+import requests
 
 User = get_user_model()
 
@@ -102,3 +105,47 @@ class ResetPasswordView(APIView):
         prt.delete()
 
         return ok("Mot de passe mis à jour", None, 200)
+# ============================================
+# 🆕 NOUVELLE VUE : Page d'activation HTML
+# ============================================
+def activate_account_page(request, uid, token):
+    """
+    Page HTML pour activer le compte via un formulaire.
+    GET : Affiche la page avec le bouton
+    POST : Active le compte via l'API Djoser
+    """
+    if request.method == 'GET':
+        # Afficher la page avec le formulaire
+        context = {
+            'uid': uid,
+            'token': token,
+        }
+        return render(request, 'accounts/activate.html', context)
+    
+    elif request.method == 'POST':
+        # Traiter l'activation en appelant l'API Djoser
+        api_url = f"{request.scheme}://{request.get_host()}/api/auth/users/activation/"
+        
+        payload = {
+            'uid': uid,
+            'token': token,
+        }
+        try:
+            response = requests.post(api_url, json=payload)
+            
+            if response.status_code == 204:
+                return JsonResponse({
+                    'success': True,
+                    'message': '✅ Votre compte a été activé avec succès !'
+                })
+            else:
+                return JsonResponse({
+                    'success': False,
+                    'message': '❌ Lien d\'activation invalide ou expiré.'
+                }, status=400)
+                
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'❌ Erreur : {str(e)}'
+            }, status=500)

@@ -1,19 +1,27 @@
-from rest_framework import serializers
-from .models import User
+from djoser.serializers import UserCreateSerializer as BaseUserCreateSerializer
+from djoser.serializers import UserSerializer as BaseUserSerializer
+from django.contrib.auth import get_user_model
 
-class RegisterSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(write_only=True, required=True, min_length=6)
+User = get_user_model()
 
-    class Meta:
+
+class UserCreateSerializer(BaseUserCreateSerializer):
+    """Création utilisateur (name + email + password)"""
+    class Meta(BaseUserCreateSerializer.Meta):
         model = User
-        fields = ("email", "name", "password")
+        fields = ("id", "email", "name", "password")
+        extra_kwargs = {
+            "password": {"write_only": True},
+            "name": {"required": False},
+        }
 
     def create(self, validated_data):
         return User.objects.create_user(**validated_data)
 
 
-class UserSerializer(serializers.ModelSerializer):
-    class Meta:
+class UserSerializer(BaseUserSerializer):
+    """Retour profil utilisateur"""
+    class Meta(BaseUserSerializer.Meta):
         model = User
-        fields = ("id", "email", "name", "username", "is_active", "date_joined")
-        read_only_fields = ("id", "username", "is_active", "date_joined")
+        fields = ("id", "email", "name", "is_active", "date_joined")
+        read_only_fields = ("id", "is_active", "date_joined")

@@ -1,16 +1,19 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from django.utils import timezone
-import uuid
-from datetime import timedelta
+
 
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
             raise ValueError("L'adresse email est obligatoire")
+
         email = self.normalize_email(email)
+
+        # username auto si non fourni
         if not extra_fields.get("username"):
             extra_fields["username"] = email.split("@")[0]
+
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
@@ -24,10 +27,13 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractBaseUser, PermissionsMixin):
-    username = models.CharField(max_length=150, default='user_default')
+    username = models.CharField(max_length=150, blank=True, null=True)
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=255, blank=True)
-    is_active = models.BooleanField(default=True)
+
+    # ✅ activation email: user inactif jusqu’à activation
+    is_active = models.BooleanField(default=False)
+
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(default=timezone.now)
 
@@ -38,25 +44,44 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-
-
+# 🆕 Ajoutez ce modèle
 class PasswordResetToken(models.Model):
-    """Modèle pour les tokens de réinitialisation de mot de passe"""
+    """
+    Token pour la réinitialisation de mot de passe.
+    """
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="reset_tokens")
-    token = models.UUIDField(default=uuid.uuid4, editable=False, unique=True)
+    token = models.CharField(max_length=100, unique=True)
     created_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField()
+    is_used = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = "password_reset_tokens"
+        ordering = ["-created_at"]
 
     def __str__(self):
         return f"Reset token for {self.user.email}"
 
     @classmethod
     def create_for(cls, user, hours=1):
+        """
+        Crée un token de réinitialisation valide pendant X heures.
+        """
+        token = secrets.token_urlsafe(32)
         expires_at = timezone.now() + timedelta(hours=hours)
-        return cls.objects.create(user=user, expires_at=expires_at)
+        
+        return cls.objects.create(
+            user=user,
+            token=token,
+            expires_at=expires_at
+        )
 
     def is_valid(self):
-        return timezone.now() < self.expires_at
-
-    class Meta:
-        ordering = ["-created_at"]
+        """
+        Vérifie si le token est encore valide.
+        """
+        if self.is_used:
+            return False
+        if timezone.now() > self.expires_at:
+            return False
+        return True

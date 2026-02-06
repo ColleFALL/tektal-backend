@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activation compte TEKTAL</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .logo {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+        
+        p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+        
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 16px 32px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .message {
+            margin-top: 20px;
+            padding: 16px;
+            border-radius: 8px;
+            display: none;
+        }
+        
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+            display: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .footer {
+            margin-top: 30px;
+            color: #999;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🗺️</div>
+        <h1>Activez votre compte TEKTAL</h1>
+        <p>Cliquez sur le bouton ci-dessous pour activer votre compte et commencer à partager vos chemins.</p>
+        
+        <form id="activationForm">
+            {% csrf_token %}
+            <input type="hidden" name="uid" value="{{ uid }}">
+            <input type="hidden" name="token" value="{{ token }}">
+            
+            <button type="submit" class="btn" id="activateBtn">
+                Activer mon compte
+                <span class="spinner" id="spinner"></span>
+            </button>
+        </form>
+        
+        <div class="message" id="message"></div>
+        
+        <div class="footer">
+            TEKTAL - Partagez vos chemins visuels
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('activationForm');
+        const btn = document.getElementById('activateBtn');
+        const spinner = document.getElementById('spinner');
+        const message = document.getElementById('message');
+        
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Désactiver le bouton
+            btn.disabled = true;
+            spinner.style.display = 'inline-block';
+            btn.textContent = 'Activation en cours... ';
+            btn.appendChild(spinner);
+            message.style.display = 'none';
+            
+            try {
+                const response = await fetch(window.location.href, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                        'Content-Type': 'application/json',
+                    },
+                });
+                
+                const data = await response.json();
+                
+                message.style.display = 'block';
+                
+                if (data.success) {
+                    message.className = 'message success';
+                    message.textContent = data.message;
+                    btn.textContent = '✅ Compte activé !';
+                    
+                    // Redirection après 3 secondes
+                    setTimeout(() => {
+                        window.location.href = '/';  // Ou vers votre page de login
+                    }, 3000);
+                } else {
+                    message.className = 'message error';
+                    message.textContent = data.message;
+                    btn.disabled = false;
+                    btn.textContent = 'Réessayer';
+                    spinner.style.display = 'none';
+                }
+                
+            } catch (error) {
+                message.style.display = 'block';
+                message.className = 'message error';
+                message.textContent = '❌ Erreur réseau. Veuillez réessayer.';
+                btn.disabled = false;
+                btn.textContent = 'Réessayer';
+                spinner.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+</html>
