@@ -106,7 +106,7 @@ class ResetPasswordView(APIView):
 
         return ok("Mot de passe mis à jour", None, 200)
 # ============================================
-# 🆕 NOUVELLE VUE : Page d'activation HTML
+#  NOUVELLE VUE : Page d'activation HTML
 # ============================================
 def activate_account_page(request, uid, token):
     """
@@ -136,16 +136,16 @@ def activate_account_page(request, uid, token):
             if response.status_code == 204:
                 return JsonResponse({
                     'success': True,
-                    'message': '✅ Votre compte a été activé avec succès !'
+                    'message': ' Votre compte a été activé avec succès !'
                 })
             else:
                 return JsonResponse({
                     'success': False,
-                    'message': '❌ Lien d\'activation invalide ou expiré.'
+                    'message': ' Lien d\'activation invalide ou expiré.'
                 }, status=400)
                 
         except Exception as e:
             return JsonResponse({
                 'success': False,
-                'message': f'❌ Erreur : {str(e)}'
+                'message': f' Erreur : {str(e)}'
             }, status=500)
