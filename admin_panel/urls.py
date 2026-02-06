@@ -1,0 +1,8 @@
+from django.urls import path
+from . import views
+
+urlpatterns = [
+    path('', views.dashboard_view, name='admin_dashboard'),
+    path('certify/<int:path_id>/', views.certify_path, name='certify_path'),
+    path('delete/<int:path_id>/', views.delete_path, name='delete_path'),
+]

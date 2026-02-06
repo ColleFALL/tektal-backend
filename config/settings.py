@@ -25,6 +25,7 @@ INSTALLED_APPS = [
     # Apps tierces
     'rest_framework',
     'corsheaders',
+    'admin_panel',
 
     # Tes apps (décommente quand créées)
     # 'users',
