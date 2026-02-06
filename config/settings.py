@@ -59,14 +59,28 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     # ton app auth
+      "core",
     "accounts",
+     "djoser",
       
-      "cloudinary",
-      "cloudinary_storage",
+    "cloudinary",
+    "cloudinary_storage",
+   
+
     # tiers
     "rest_framework",
     "rest_framework_simplejwt.token_blacklist",
 ]
+DJOSER = {
+    "LOGIN_FIELD": "email",
+    "SEND_ACTIVATION_EMAIL": False,
+    "PASSWORD_RESET_CONFIRM_RETYPE": True,
+    "PASSWORD_RESET_CONFIRM_URL": "reset-password/{uid}/{token}",
+
+    "EMAIL": {
+        "password_reset": "accounts.djoser_emails.PasswordResetEmail",
+    },
+}
 
 # =========================
 # MIDDLEWARE

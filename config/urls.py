@@ -13,6 +13,7 @@ urlpatterns = [
 
     #  Auth custom (Register, Login, Me, Forgot, Reset)
     path("api/auth/", include("accounts.urls")),
+    path("api/auth/", include("djoser.urls")),
 
   
 ]
