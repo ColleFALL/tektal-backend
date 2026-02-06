@@ -8,7 +8,6 @@ class Path(models.Model):
     creator = models.ForeignKey(User, on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
 
-    # Champs spécifiques à l'Admin
     is_official = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     admin_note = models.TextField(blank=True, null=True)

@@ -26,7 +26,6 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'admin_panel',
-    'admin_panel', # AJOUTE CETTE LIGNE
 
     # Tes apps (décommente quand créées)
     # 'users',
