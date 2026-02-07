@@ -1,0 +1,8 @@
+Bonjour {{ user.username }},
+
+Merci de vous être inscrit sur le panel Tektal Admin. 
+Pour activer votre compte et pouvoir vous connecter, veuillez cliquer sur le lien ci-dessous :
+
+http://{{ domain }}{% url 'admin_panel:activate' uidb64=uid token=token %}
+
+Si vous n'êtes pas à l'origine de cette demande, vous pouvez ignorer cet email.

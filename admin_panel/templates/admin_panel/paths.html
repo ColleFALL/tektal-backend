@@ -1,45 +1,41 @@
 {% extends 'admin_panel/base.html' %}
 
 {% block content %}
-<h2 class="text-3xl font-bold mb-8 text-gray-900">Gestion des Chemins</h2>
-
-<div class="relative mb-10">
-    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400">
-        <i class="bi bi-search"></i>
-    </span>
-    <input type="text" placeholder="Rechercher un chemin..." 
-           class="w-full pl-12 pr-4 py-4 bg-white border border-gray-100 rounded-2xl shadow-sm focus:ring-2 focus:ring-500 outline-none transition">
+<div class="flex justify-between items-center mb-10">
+    <h2 class="text-3xl font-bold">Gestion des Chemins</h2>
 </div>
 
-<div class="grid gap-6">
-    {% for path in paths %}
-    <div class="bg-white p-8 rounded-3xl border border-gray-50 shadow-sm relative overflow-hidden">
-        <div class="flex justify-between items-start mb-6">
-            <div>
-                <h3 class="text-xl font-bold text-gray-800">{{ path.title }}</h3>
-                <p class="text-gray-400 text-sm mt-1">Par {{ path.author.username }}</p>
-            </div>
-            <div class="flex items-center space-x-4">
-                <span class="text-gray-400 text-sm">{{ path.views_count|default:"0" }} vues</span>
-                {% if path.is_official %}
-                <span class="px-3 py-1 bg-purple-100 text-purple-600 text-xs font-bold rounded-full">Officiel</span>
-                {% endif %}
-            </div>
-        </div>
-
-        <div class="flex space-x-3">
-            {% if not path.is_official %}
-            <a href="{% url 'admin_panel:certify_path' path.id %}" 
-               class="flex items-center space-x-2 px-6 py-3 bg-gray-50 text-gray-700 font-bold rounded-xl border border-gray-100 hover:bg-gray-100 transition">
-                <i class="bi bi-check2"></i> <span>Marquer officiel</span>
-            </a>
-            {% endif %}
-            <a href="{% url 'admin_panel:delete_path' path.id %}" 
-               class="flex items-center space-x-2 px-6 py-3 bg-red-50 text-red-500 font-bold rounded-xl border border-red-50 hover:bg-red-100 transition">
-                <i class="bi bi-trash"></i> <span>Supprimer</span>
-            </a>
-        </div>
-    </div>
-    {% endfor %}
+<div class="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
+    <table class="w-full text-left border-collapse">
+        <thead class="bg-gray-50 border-b border-gray-100">
+            <tr>
+                <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Titre</th>
+                <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Campus</th>
+                <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase">Status</th>
+                <th class="px-6 py-4 text-xs font-bold text-gray-400 uppercase text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-50">
+            {% for path in paths %}
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-6 py-4 font-bold text-gray-800">{{ path.title }}</td>
+                <td class="px-6 py-4 text-gray-500">{{ path.campus }}</td>
+                <td class="px-6 py-4">
+                    {% if path.is_official %}
+                        <span class="px-3 py-1 bg-green-50 text-green-600 text-[10px] font-bold rounded-full uppercase">Officiel</span>
+                    {% else %}
+                        <span class="px-3 py-1 bg-gray-100 text-gray-400 text-[10px] font-bold rounded-full uppercase">En attente</span>
+                    {% endif %}
+                </td>
+                <td class="px-6 py-4 text-right space-x-2">
+                    {% if not path.is_official %}
+                    <a href="{% url 'admin_panel:certify_path' path.id %}" class="text-yellow-600 hover:text-yellow-700 font-bold text-sm">Certifier</a>
+                    {% endif %}
+                    <a href="{% url 'admin_panel:delete_path' path.id %}" class="text-red-400 hover:text-red-600 font-bold text-sm" onclick="return confirm('Supprimer ce trajet ?')">Supprimer</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}

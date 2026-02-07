@@ -138,3 +138,14 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
 }
+
+
+
+
+# Pendant le développement : affiche les emails dans la console VS Code
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+
+# Configuration pour rediriger après connexion
+LOGIN_URL = 'admin_panel:admin_login'
+LOGIN_REDIRECT_URL = 'admin_panel:admin_dashboard'
+LOGOUT_REDIRECT_URL = 'admin_panel:admin_login'
