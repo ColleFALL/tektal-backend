@@ -190,8 +190,10 @@ DJOSER = {
     "SEND_ACTIVATION_EMAIL": True,
     "SEND_CONFIRMATION_EMAIL": False,
 
-    "ACTIVATION_URL": "activate/{uid}/{token}",
-    "PASSWORD_RESET_CONFIRM_URL": "reset-password/{uid}/{token}",
+    # "ACTIVATION_URL": "activate/{uid}/{token}",
+    "ACTIVATION_URL": "activate.html?uid={uid}&token={token}",
+    # "PASSWORD_RESET_CONFIRM_URL": "reset-password/{uid}/{token}",
+    "PASSWORD_RESET_CONFIRM_URL": "reset-password.html?uid={uid}&token={token}",
     "PASSWORD_RESET_CONFIRM_RETYPE": True,
 
 
