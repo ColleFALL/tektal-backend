@@ -15,7 +15,8 @@ urlpatterns = [
     # ✅ Auth via Djoser (register, activation, login, me, reset password)
     path("api/auth/", include("djoser.urls")),
     path("api/auth/", include("djoser.urls.jwt")),
-    #  path('activate/<str:uid>/<str:token>/', activate_account_page, name='activate_account')
+    # ✅ Endpoints de l’app paths
+    path("api/", include("paths.urls")),  # <--- on inclut ici
 ]
 
 # Servir les médias en dev
