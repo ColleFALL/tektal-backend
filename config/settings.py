@@ -194,9 +194,13 @@ DJOSER = {
     "PASSWORD_RESET_CONFIRM_URL": "reset-password/{uid}/{token}",
     "PASSWORD_RESET_CONFIRM_RETYPE": True,
 
-    "DOMAIN": DOMAIN,
+
+    # "DOMAIN": DOMAIN,
     "SITE_NAME": SITE_NAME,
-    "PROTOCOL": PROTOCOL,
+    # "PROTOCOL": PROTOCOL,
+    "DOMAIN": "active-tektal.vercel.app",
+    "PROTOCOL": "https",
+
 
     "SERIALIZERS": {
         "user_create": "accounts.serializers.UserCreateSerializer",
