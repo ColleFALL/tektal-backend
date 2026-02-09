@@ -190,13 +190,19 @@ DJOSER = {
     "SEND_ACTIVATION_EMAIL": True,
     "SEND_CONFIRMATION_EMAIL": False,
 
-    "ACTIVATION_URL": "activate/{uid}/{token}",
-    "PASSWORD_RESET_CONFIRM_URL": "reset-password/{uid}/{token}",
+
+    "ACTIVATION_URL": "activate.html?uid={uid}&token={token}",
+    "PASSWORD_RESET_CONFIRM_URL": "reset-password.html?uid={uid}&token={token}",
+    "DOMAIN": "active-tektal.vercel.app",
+    "PROTOCOL": "https",
+
+    # "ACTIVATION_URL": "activate/{uid}/{token}",
+    # "PASSWORD_RESET_CONFIRM_URL": "reset-password/{uid}/{token}",
     "PASSWORD_RESET_CONFIRM_RETYPE": True,
 
-    "DOMAIN": DOMAIN,
+    # "DOMAIN": DOMAIN,
     "SITE_NAME": SITE_NAME,
-    "PROTOCOL": PROTOCOL,
+    # "PROTOCOL": PROTOCOL,
 
     "SERIALIZERS": {
         "user_create": "accounts.serializers.UserCreateSerializer",
