@@ -1,4 +1,4 @@
-    <!-- <!DOCTYPE html>
+    <!DOCTYPE html>
     <html lang="fr">
     <head>
         <meta charset="UTF-8">
@@ -196,85 +196,4 @@
             });
         </script>
     </body>
-    </html> -->
-
-    <!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Activation compte TEKTAL</title>
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, sans-serif;
-      background: #f6f6f6;
-      min-height: 100vh;
-      display: flex; align-items: center; justify-content: center;
-      padding: 20px;
-    }
-    .container {
-      background: white; padding: 40px; border-radius: 16px;
-      box-shadow: 0 10px 40px rgba(0,0,0,0.1);
-      max-width: 500px; width: 100%; text-align: center;
-    }
-    h1 { font-size: 24px; margin-bottom: 10px; }
-    p { color: #666; margin-bottom: 30px; }
-    .btn {
-      background: #f4b000; color: #111;
-      border: none; padding: 14px 24px; border-radius: 8px;
-      cursor: pointer; font-weight: 600; width: 100%;
-    }
-    .message { margin-top: 20px; padding: 12px; border-radius: 8px; display: none; }
-    .success { background: #d4edda; color: #155724; }
-    .error { background: #f8d7da; color: #721c24; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <h1>Activez votre compte TEKTAL</h1>
-    <p>Cliquez sur le bouton pour activer votre compte.</p>
-
-    <button id="activateBtn" class="btn">Activer mon compte</button>
-
-    <div id="message" class="message"></div>
-  </div>
-
-  <script>
-    const btn = document.getElementById("activateBtn");
-    const msg = document.getElementById("message");
-
-    const uid = "{{ uid }}";
-    const token = "{{ token }}";
-
-    btn.addEventListener("click", async () => {
-      btn.disabled = true;
-      btn.textContent = "Activation en cours...";
-
-      try {
-        const res = await fetch("/api/auth/users/activation/", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ uid, token })
-        });
-
-        if (res.status === 204) {
-          msg.className = "message success";
-          msg.textContent = "✅ Compte activé !";
-        } else {
-          const data = await res.json();
-          msg.className = "message error";
-          msg.textContent = JSON.stringify(data);
-        }
-      } catch (e) {
-        msg.className = "message error";
-        msg.textContent = "❌ Erreur réseau.";
-      } finally {
-        msg.style.display = "block";
-        btn.textContent = "Activer mon compte";
-        btn.disabled = false;
-      }
-    });
-  </script>
-</body>
-</html>
+    </html>
