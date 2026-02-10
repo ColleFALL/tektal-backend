@@ -2,7 +2,7 @@ from djoser import email
 from core.emailer import send_brevo_email
 import os
 from django.core.mail.backends.base import BaseEmailBackend
-from django.conf import settings
+# from core.emailer import send_brevo_email
 
 
 class BrevoAPIEmailBackend(BaseEmailBackend):
@@ -38,27 +38,20 @@ class ActivationEmail(email.ActivationEmail):
     def send(self, to, *args, **kwargs):
         to_email = to[0] if isinstance(to, (list, tuple)) else to
         context = self.get_context_data()
-        
-        # Récupérer uid et token depuis le context
-        uid = context.get('uid')
-        token = context.get('token')
-        
-        # Construire le lien avec query parameters pour correspondre à votre page HTML
-        frontend_url = getattr(settings, 'FRONTEND_URL', 'https://active-tektal.vercel.app')
-        link = f"{frontend_url}/activate?uid={uid}&token={token}"
+        link = context.get("url") or ""
 
         html = f"""
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
           <h2>Activation de votre compte TEKTAL</h2>
           <p>Bienvenue sur TEKTAL ! Cliquez sur le lien ci-dessous pour activer votre compte :</p>
           <p>
-            <a href="{link}" style="display:inline-block;padding:10px 14px;background-color:#FEBD00;color:#111111;text-decoration:none;border-radius:6px;font-weight:bold;">
+            <a href="{link}" style="display:inline-block;padding:10px 14px;text-decoration:none;border-radius:6px;">
               Activer mon compte
             </a>
           </p>
           <p>Si le bouton ne fonctionne pas, copiez-collez ce lien dans votre navigateur :</p>
-          <p><a href="{link}" style="color:#FEBD00;">{link}</a></p>
-          <p>Si vous n'êtes pas à l'origine de cette inscription, ignorez cet email.</p>
+          <p><a href="{link}">{link}</a></p>
+          <p>Si vous n’êtes pas à l’origine de cette inscription, ignorez cet email.</p>
         </div>
         """
 
@@ -73,27 +66,20 @@ class PasswordResetEmail(email.PasswordResetEmail):
     def send(self, to, *args, **kwargs):
         to_email = to[0] if isinstance(to, (list, tuple)) else to
         context = self.get_context_data()
-        
-        # Récupérer uid et token
-        uid = context.get('uid')
-        token = context.get('token')
-        
-        # Construire le lien avec query parameters
-        frontend_url = getattr(settings, 'FRONTEND_URL', 'https://active-tektal.vercel.app')
-        link = f"{frontend_url}/reset-password?uid={uid}&token={token}"
+        link = context.get("url") or ""
 
         html = f"""
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
           <h2>Réinitialisation de mot de passe</h2>
           <p>Vous avez demandé à réinitialiser votre mot de passe TEKTAL.</p>
           <p>
-            <a href="{link}" style="display:inline-block;padding:10px 14px;background-color:#FEBD00;color:#111111;text-decoration:none;border-radius:6px;font-weight:bold;">
-              Réinitialiser mon mot de passe
+            <a href="{link}" style="display:inline-block;padding:10px 14px;text-decoration:none;border-radius:6px;">
+              Cliquez ici pour continuer
             </a>
           </p>
           <p>Si le bouton ne fonctionne pas, copiez-collez ce lien dans votre navigateur :</p>
-          <p><a href="{link}" style="color:#FEBD00;">{link}</a></p>
-          <p>Si ce n'est pas vous, ignorez cet email.</p>
+          <p><a href="{link}">{link}</a></p>
+          <p>Si ce n’est pas vous, ignorez cet email.</p>
         </div>
         """
 
