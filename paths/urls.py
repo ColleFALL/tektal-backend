@@ -1,6 +1,7 @@
 from django.urls import path
-from paths.views import PathCreateView
+from paths.views.path_views import PathCreateView, PathListView
 
 urlpatterns = [
-    # path('paths/', PathCreateView.as_view(), name='path-create'),
+    path('paths/', PathListView.as_view(), name='path-list'),
+    path('paths/', PathCreateView.as_view(), name='path-create'),
 ]

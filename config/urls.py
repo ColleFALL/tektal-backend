@@ -16,7 +16,7 @@ urlpatterns = [
     path("api/auth/", include("djoser.urls")),
     path("api/auth/", include("djoser.urls.jwt")),
     #  Endpoints de l’app paths
-    # path("api/", include("paths.urls")),  # <--- on inclut ici
+    path("api/", include("paths.urls")),  # <--- on inclut ici
 ]
 
 # Servir les médias en dev
