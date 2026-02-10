@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     # Local apps
     "accounts",
     "core",
-    "paths",  # on activera au BE-2
+    # "paths",  # on activera au BE-2
 ]
 
 # =========================
