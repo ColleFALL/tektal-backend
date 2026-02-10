@@ -187,8 +187,7 @@ DJOSER = {
     "USER_CREATE_PASSWORD_RETYPE": False,
 
     #  Activation email ON
-    # "SEND_ACTIVATION_EMAIL": True,
-      "SEND_ACTIVATION_EMAIL": False,  # à mettre à True pour activer l’envoi d’emails d’activation
+    "SEND_ACTIVATION_EMAIL": True,
     "SEND_CONFIRMATION_EMAIL": False,
 
 
