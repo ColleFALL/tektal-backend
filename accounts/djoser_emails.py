@@ -44,7 +44,9 @@ class ActivationEmail(email.ActivationEmail):
         
         # ✅ CORRECTION : Construire le lien frontend avec query parameters
         frontend_url = getattr(settings, 'FRONTEND_URL', 'https://active-tektal.vercel.app')
-        link = f"{frontend_url}/activate?uid={uid}&token={token}"
+        link = f"{frontend_url}/activate.html?uid={uid}&token={token}"
+
+        # link = f"{frontend_url}/activate?uid={uid}&token={token}"
 
         html = f"""
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
