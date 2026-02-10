@@ -181,28 +181,26 @@ DOMAIN = os.environ.get("DOMAIN", "localhost:5173")
 SITE_NAME = os.environ.get("SITE_NAME", "TEKTAL")
 PROTOCOL = os.environ.get("PROTOCOL", ("https" if not DEBUG else "http"))
 
+# URL de votre page d'activation frontend
+FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://active-tektal.vercel.app")
+
 DJOSER = {
     "LOGIN_FIELD": "email",
-    # Comme Red Product (tu peux garder False si vous n’utilisez pas re_password)
     "USER_CREATE_PASSWORD_RETYPE": False,
 
-    #  Activation email ON
+    # Activation email ON
     "SEND_ACTIVATION_EMAIL": True,
     "SEND_CONFIRMATION_EMAIL": False,
 
-
-    "ACTIVATION_URL": "activate.html?uid={uid}&token={token}",
-    "PASSWORD_RESET_CONFIRM_URL": "reset-password.html?uid={uid}&token={token}",
+    # Ces paramètres ne sont plus utilisés car vous construisez le lien manuellement
+    # mais on les garde pour éviter les erreurs Djoser
+    'ACTIVATION_URL': 'activate?uid={uid}&token={token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'reset-password?uid={uid}&token={token}',
+     
+    'PROTOCOL': 'https',
     "DOMAIN": "active-tektal.vercel.app",
-    "PROTOCOL": "https",
 
-    # "ACTIVATION_URL": "activate/{uid}/{token}",
-    # "PASSWORD_RESET_CONFIRM_URL": "reset-password/{uid}/{token}",
     "PASSWORD_RESET_CONFIRM_RETYPE": True,
-
-    # "DOMAIN": DOMAIN,
-    "SITE_NAME": SITE_NAME,
-    # "PROTOCOL": PROTOCOL,
 
     "SERIALIZERS": {
         "user_create": "accounts.serializers.UserCreateSerializer",
@@ -216,7 +214,6 @@ DJOSER = {
         "password_reset": "accounts.djoser_emails.PasswordResetEmail",
     },
 }
-
 # =========================
 # EMAIL (Brevo API)
 # =========================
