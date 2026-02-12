@@ -81,7 +81,9 @@ class PasswordResetEmail(email.PasswordResetEmail):
         
         # ✅ CORRECTION : Construire le lien frontend avec query parameters
         frontend_url = getattr(settings, 'FRONTEND_URL', 'https://active-tektal.vercel.app')
-        link = f"{frontend_url}/reset-password?uid={uid}&token={token}"
+        # link = f"{frontend_url}/reset-password?uid={uid}&token={token}"
+        link = f"{frontend_url}/reset-password.html?uid={uid}&token={token}"
+
 
         html = f"""
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
