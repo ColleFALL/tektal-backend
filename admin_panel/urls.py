@@ -14,5 +14,5 @@ urlpatterns = [
     path('paths/certify/<int:path_id>/', views.certify_path, name='certify_path'),
     path('users/', views.users_view, name='users'),
     path('users/toggle-admin/<int:user_id>/', views.toggle_admin, name='toggle_admin'),
-    path('users/delete/<int:user_id>/', views.delete_user, name='delete_user'),
+    path('users/delete/<int:user_id>/', views.delete_user, name='delete_user'), # UNE SEULE FOIS ICI
 ]

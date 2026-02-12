@@ -11,6 +11,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
+
 # ========================
 # APPLICATIONS
 # ========================
@@ -20,18 +21,17 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles',
+    
+    # CLOUDINARY APPS 
+    'cloudinary_storage', 
+    'django.contrib.staticfiles', # Apparaît UNE SEULE FOIS
+    'cloudinary',
 
     # Apps tierces
     'rest_framework',
     'corsheaders',
     'admin_panel',
-
-    # Tes apps (décommente quand créées)
-    # 'users',
-    # 'products',
 ]
-
 
 # ========================
 # MIDDLEWARE
@@ -138,3 +138,17 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.AllowAny',
     ],
 }
+
+
+
+
+
+
+# configuration cloudinary
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dqcc8n1th',
+    'API_KEY': '857318344232319',
+    'API_SECRET': '9ARehQB_PlgrOX54XtlcOPZVZR8'
+}
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
