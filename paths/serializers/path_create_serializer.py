@@ -5,7 +5,9 @@ from paths.serializers.step_serializer import StepSerializer
 
 
 class PathCreateSerializer(serializers.ModelSerializer):
-    steps = StepSerializer(many=True, read_only=True)  # affichage dans la réponse
+    # 🔹 Récupère les steps liés automatiquement
+    steps = serializers.SerializerMethodField()
+
     start_lat = serializers.DecimalField(
         max_digits=9, decimal_places=6, required=False, allow_null=True
     )
@@ -38,7 +40,10 @@ class PathCreateSerializer(serializers.ModelSerializer):
             'steps',
         ]
 
-    # Validation du nombre d'étapes
+    # 🔹 Sérialisation des steps liés
+    def get_steps(self, obj):
+        return StepSerializer(obj.steps.all(), many=True).data
+
     def validate_steps(self, value):
         if not (2 <= len(value) <= 6):
             raise serializers.ValidationError(
@@ -46,7 +51,6 @@ class PathCreateSerializer(serializers.ModelSerializer):
             )
         return value
 
-    # Validation de la durée max de la vidéo
     def validate_duration(self, value):
         if value > 45:
             raise serializers.ValidationError(
@@ -54,7 +58,6 @@ class PathCreateSerializer(serializers.ModelSerializer):
             )
         return value
 
-    # Validation globale pour que les steps respectent la durée max
     def validate(self, data):
         steps = data.get('steps', [])
         if steps:
@@ -70,10 +73,8 @@ class PathCreateSerializer(serializers.ModelSerializer):
         steps_data = validated_data.pop('steps', [])  # sécurisation
         user = self.context['request'].user
 
-        # Création du Path
         path = Path.objects.create(user=user, **validated_data)
 
-        # Création des steps liés automatiquement
         for step_data in steps_data:
             Step.objects.create(path=path, **step_data)
 
