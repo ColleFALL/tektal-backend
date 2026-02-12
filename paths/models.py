@@ -21,11 +21,11 @@ class Path(models.Model):
     start_label = models.CharField(max_length=255)
     end_label = models.CharField(max_length=255)
 
-    start_lat = models.DecimalField(max_digits=9, decimal_places=6)
-    start_lng = models.DecimalField(max_digits=9, decimal_places=6)
-
-    end_lat = models.DecimalField(max_digits=9, decimal_places=6)
-    end_lng = models.DecimalField(max_digits=9, decimal_places=6)
+    # ⚡ Latitudes et longitudes optionnelles
+    start_lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    start_lng = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    end_lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
+    end_lng = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)
 
     video_url = models.URLField()
     duration = models.PositiveIntegerField(help_text="Duration in seconds")
@@ -42,6 +42,7 @@ class Path(models.Model):
 
     def __str__(self):
         return f"{self.title} ({self.user})"
+
 
 class Step(models.Model):
     

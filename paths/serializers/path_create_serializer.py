@@ -5,7 +5,21 @@ from paths.serializers.step_serializer import StepSerializer
 
 
 class PathCreateSerializer(serializers.ModelSerializer):
-    steps = StepSerializer(many=True)  # liste des étapes
+    steps = StepSerializer(many=True)
+
+    # ⚡ Rendre les latitudes et longitudes optionnelles
+    start_lat = serializers.DecimalField(
+        max_digits=9, decimal_places=6, required=False, allow_null=True
+    )
+    start_lng = serializers.DecimalField(
+        max_digits=9, decimal_places=6, required=False, allow_null=True
+    )
+    end_lat = serializers.DecimalField(
+        max_digits=9, decimal_places=6, required=False, allow_null=True
+    )
+    end_lng = serializers.DecimalField(
+        max_digits=9, decimal_places=6, required=False, allow_null=True
+    )
 
     class Meta:
         model = Path
@@ -22,6 +36,7 @@ class PathCreateSerializer(serializers.ModelSerializer):
             'steps',
         ]
 
+    # ⚡ Validation du nombre d'étapes
     def validate_steps(self, value):
         if not (2 <= len(value) <= 6):
             raise serializers.ValidationError(
@@ -31,13 +46,13 @@ class PathCreateSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def create(self, validated_data):
-        steps_data = validated_data.pop('steps')
+        steps_data = validated_data.pop('steps', [])  # <-- sécurisation si pas de steps
         user = self.context['request'].user
 
         # Crée le chemin
         path = Path.objects.create(user=user, **validated_data)
 
-        # Crée les étapes
+        # Crée les étapes et injecte le path automatiquement
         for step_data in steps_data:
             Step.objects.create(path=path, **step_data)
 

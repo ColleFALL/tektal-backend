@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from paths.models import Step, Path
+from paths.models import Step
 
 
 class StepSerializer(serializers.ModelSerializer):
@@ -7,7 +7,6 @@ class StepSerializer(serializers.ModelSerializer):
         model = Step
         fields = [
             'id',
-            'path',
             'step_number',
             'start_time',
             'end_time',
