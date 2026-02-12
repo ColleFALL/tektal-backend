@@ -1,0 +1,42 @@
+{% extends 'admin_panel/base.html' %}
+{% block content %}
+<div class="p-6 grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div>
+        <a href="{% url 'admin_panel:paths' %}" class="text-sm text-gray-400 mb-4 inline-block hover:text-black"><i class="bi bi-chevron-left"></i> Retour</a>
+        <h2 class="text-2xl font-bold mb-4">{{ path.title }}</h2>
+        <div class="bg-black rounded-3xl overflow-hidden aspect-[9/16] shadow-xl">
+            <video id="v" src="{{ path.video_url }}" class="w-full h-full object-cover" controls></video>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+            <h3 class="font-bold mb-4">Ajouter une étape</h3>
+            <form method="POST" class="space-y-4">
+                {% csrf_token %}
+                <input type="text" name="instruction" placeholder="Ex: Tourner à droite après le portail" class="w-full p-3 border rounded-xl" required>
+                <div class="flex space-x-2">
+                    <input type="number" name="timestamp" id="t" placeholder="Seconde" class="w-full p-3 border rounded-xl" required>
+                    <button type="button" onclick="document.getElementById('t').value = Math.floor(document.getElementById('v').currentTime)" class="px-4 bg-gray-100 rounded-xl font-bold">Capture</button>
+                </div>
+                <button type="submit" class="w-full py-3 bg-[#FEBD00] text-white font-bold rounded-xl">Valider l'étape</button>
+            </form>
+        </div>
+
+        <div class="space-y-3">
+            <h4 class="font-bold text-gray-400 uppercase text-xs tracking-widest">Instructions enregistrées</h4>
+            {% for step in steps %}
+            <div class="bg-white p-4 rounded-2xl flex justify-between items-center border border-gray-50 shadow-sm">
+                <div class="flex items-center space-x-3">
+                    <span class="w-8 h-8 bg-black text-white rounded-full flex items-center justify-center text-xs">{{ forloop.counter }}</span>
+                    <div>
+                        <p class="font-bold text-gray-800">{{ step.instruction }}</p>
+                        <p class="text-[10px] text-gray-400 italic">À {{ step.timestamp }} secondes</p>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
