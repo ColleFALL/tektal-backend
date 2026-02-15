@@ -58,7 +58,7 @@ def create_path(request):
             messages.success(request, "Parcours créé avec succès.")
     return redirect('admin_panel:paths')
 
-# C'ÉTAIT CETTE FONCTION QUI MANQUAIT :
+
 @user_passes_test(is_admin, login_url='admin_panel:admin_login')
 def path_detail(request, path_id):
     path = get_object_or_404(Path, id=path_id)

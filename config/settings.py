@@ -141,14 +141,3 @@ REST_FRAMEWORK = {
 
 
 
-
-
-
-# configuration cloudinary
-CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': 'dqcc8n1th',
-    'API_KEY': '857318344232319',
-    'API_SECRET': '9ARehQB_PlgrOX54XtlcOPZVZR8'
-}
-
-DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'

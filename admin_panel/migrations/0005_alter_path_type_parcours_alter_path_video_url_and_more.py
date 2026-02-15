@@ -17,7 +17,7 @@ class Migration(migrations.Migration):
         ),
         migrations.AlterField(
             model_name='path',
-            name='video_url',
+            name='video_url',  
             field=models.URLField(default='http://temp.com', help_text='Lien vers la vidéo Cloudinary', max_length=500),
             preserve_default=False,
         ),
