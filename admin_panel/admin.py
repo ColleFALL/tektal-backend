@@ -3,11 +3,12 @@ from .models import Path, Step
 
 @admin.register(Path)
 class PathAdmin(admin.ModelAdmin):
-    # On affiche les infos importantes dans la liste
-    list_display = ('title', 'type_parcours', 'is_official', 'created_at')
-    list_filter = ('type_parcours', 'is_official')
-    search_fields = ('title',)
+    list_display = ('title', 'author', 'status', 'created_at')
+    list_filter = ('status', 'type_parcours', 'created_at')
+    search_fields = ('title', 'author__username')
+    ordering = ('-created_at',)
 
 @admin.register(Step)
 class StepAdmin(admin.ModelAdmin):
-    list_display = ('path', 'order', 'instruction')
+    list_display = ('path', 'order', 'instruction', 'timestamp')
+    ordering = ('path', 'order')

@@ -1,0 +1,9 @@
+# admin_panel/permissions.py
+from rest_framework import permissions
+
+class IsAdminUser(permissions.BasePermission):
+    """
+    Autorise uniquement les utilisateurs is_staff=True
+    """
+    def has_permission(self, request, view):
+        return bool(request.user and request.user.is_authenticated and request.user.is_staff)

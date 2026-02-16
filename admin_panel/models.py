@@ -1,27 +1,34 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+STATUS_CHOICES = [
+    ('PENDING', 'En attente'),
+    ('APPROVED', 'Validé'),
+    ('REJECTED', 'Refusé'),
+]
+
+TYPE_CHOICES = [
+    ('DESTINATION', 'Destination'),
+    ('ACTIVITY', 'Activité'),
+]
+
 class Path(models.Model):
-    TYPE_CHOICES = [
-        ('DESTINATION', 'Lieu unique'),
-        ('ETAPE', 'Parcours à étapes'),
-        ('CHEMIN', 'Itinéraire complet'),
-    ]
     title = models.CharField(max_length=255)
-    type_parcours = models.CharField(max_length=20, choices=TYPE_CHOICES, default='DESTINATION')
-    video_url = models.URLField(max_length=500)
-    is_official = models.BooleanField(default=False)
+    type_parcours = models.CharField(max_length=50, choices=TYPE_CHOICES)
+    video_url = models.URLField()
     author = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.title
 
-class Step(models.Model):
-    path = models.ForeignKey(Path, related_name='steps', on_delete=models.CASCADE)
-    instruction = models.TextField()
-    timestamp = models.IntegerField(help_text="Seconde dans la vidéo")
-    order = models.PositiveIntegerField(default=1)
 
-    class Meta:
-        ordering = ['order']
+class Step(models.Model):
+    path = models.ForeignKey(Path, on_delete=models.CASCADE, related_name='steps')
+    instruction = models.TextField()
+    order = models.PositiveIntegerField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.path.title} - Step {self.order}"
