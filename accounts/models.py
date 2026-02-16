@@ -44,7 +44,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     name = models.CharField(max_length=255, blank=True)
 
-    # ✅ NOUVEAU CHAMP ROLE
+    #  NOUVEAU CHAMP ROLE
     ROLE_CHOICES = (
         ("participant", "Participant"),
         ("admin", "Admin"),

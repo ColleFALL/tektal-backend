@@ -31,7 +31,7 @@ class PathCreateView(generics.CreateAPIView):
 
     def perform_create(self, serializer):
         # ⚡ On ne passe plus `user`, le serializer s'en occupe
-        serializer.save(status="draft")  # toujours draft à la création
+        serializer.save(status="published") 
 
 
 # ⚡ AJOUT : Pagination standard pour feed
