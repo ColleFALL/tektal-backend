@@ -2,12 +2,9 @@ from django.urls import path
 from . import api_views
 
 urlpatterns = [
-    # Parcs
-    path('api/paths/', api_views.list_paths, name='list_paths'),
-    path('api/paths/<int:path_id>/', api_views.path_detail, name='path_detail'),
-    path('api/paths/approve/<int:path_id>/', api_views.approve_path, name='approve_path'),
-    path('api/paths/reject/<int:path_id>/', api_views.reject_path, name='reject_path'),
-
-    # Utilisateurs connectés
-    path('api/connected-users/', api_views.connected_users, name='connected_users'),
+    path('api/paths/', api_views.PathListView.as_view(), name='paths-list'),
+    path('api/paths/<int:pk>/', api_views.PathDetailView.as_view(), name='paths-detail'),
+    path('api/paths/approve/<int:pk>/', api_views.PathApproveView.as_view(), name='paths-approve'),
+    path('api/paths/reject/<int:pk>/', api_views.PathRejectView.as_view(), name='paths-reject'),
+    path('api/users/connected/', api_views.ConnectedUsersView.as_view(), name='users-connected'),
 ]
