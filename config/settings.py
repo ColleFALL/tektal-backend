@@ -24,13 +24,16 @@ ALLOWED_HOSTS = os.environ.get(
 # APPS
 # =========================
 INSTALLED_APPS = [
-    # Django
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
+
+    # Cloudinary (ordre important)
+    "cloudinary_storage",
     "django.contrib.staticfiles",
+    "cloudinary",
 
     # Third-party
     "rest_framework",
@@ -39,37 +42,34 @@ INSTALLED_APPS = [
     "djoser",
     "corsheaders",
 
-    # Cloudinary (optionnel si upload direct mobile, mais OK à garder)
-    "cloudinary",
-    "cloudinary_storage",
-
     # Local apps
     "accounts",
     "core",
-    "paths",  # on activera au BE-2
+    "paths",
+    "admin_panel",
 ]
 
-# ========================
-# APPLICATIONS
-# ========================
-INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
+# # ========================
+# # APPLICATIONS
+# # ========================
+# INSTALLED_APPS = [
+#     'django.contrib.admin',
+#     'django.contrib.auth',
+#     'django.contrib.contenttypes',
+#     'django.contrib.sessions',
+#     'django.contrib.messages',
 
     
-    # CLOUDINARY APPS 
-    'cloudinary_storage', 
-    'django.contrib.staticfiles', # Apparaît UNE SEULE FOIS
-    'cloudinary',
+#     # CLOUDINARY APPS 
+#     'cloudinary_storage', 
+#     'django.contrib.staticfiles', # Apparaît UNE SEULE FOIS
+#     'cloudinary',
 
-    # Apps tierces
-    'rest_framework',
-    'corsheaders',
-    'admin_panel',
-]
+#     # Apps tierces
+#     'rest_framework',
+#     'corsheaders',
+#     'admin_panel',
+# ]
 
 
 
