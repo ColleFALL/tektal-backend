@@ -88,7 +88,7 @@ class PathCreateSerializer(serializers.ModelSerializer):
         # Forcer sécurité
         path = Path.objects.create(
             user=user,
-            status='published',
+            status='draft',
             is_official=False,
             **validated_data
         )
