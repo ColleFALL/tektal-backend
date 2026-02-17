@@ -5,6 +5,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 # from accounts.views import activate_account_page
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from paths.views.share_views import SharePathRedirectView
 
 def home(request):
     return JsonResponse({"success": True, "message": "TEKTAL API is running"})
@@ -26,6 +27,8 @@ urlpatterns = [
     # Routes de l'app admin_panel
     path('admin-panel/', include('admin_panel.urls')),
 
+
+    path("share/<uuid:share_token>/", SharePathRedirectView.as_view(), name="share-redirect"),
 ]
 
 # Servir les médias en dev
