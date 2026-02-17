@@ -1,3 +1,34 @@
 from django.db import models
+from django.contrib.auth.models import User
 
-# Create your models here.
+STATUS_CHOICES = [
+    ('PENDING', 'En attente'),
+    ('APPROVED', 'Validé'),
+    ('REJECTED', 'Refusé'),
+]
+
+TYPE_CHOICES = [
+    ('DESTINATION', 'Destination'),
+    ('ACTIVITY', 'Activité'),
+]
+
+class Path(models.Model):
+    title = models.CharField(max_length=255)
+    type_parcours = models.CharField(max_length=50, choices=TYPE_CHOICES)
+    video_url = models.URLField()
+    author = models.ForeignKey(User, on_delete=models.CASCADE)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return self.title
+
+
+class Step(models.Model):
+    path = models.ForeignKey(Path, on_delete=models.CASCADE, related_name='steps')
+    instruction = models.TextField()
+    order = models.PositiveIntegerField()
+    timestamp = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.path.title} - Step {self.order}"

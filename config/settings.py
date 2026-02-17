@@ -20,7 +20,6 @@ ALLOWED_HOSTS = os.environ.get(
     "DJANGO_ALLOWED_HOSTS",
     "127.0.0.1,localhost"
 ).split(",")
-
 # =========================
 # APPS
 # =========================
@@ -50,7 +49,44 @@ INSTALLED_APPS = [
     "paths",  # on activera au BE-2
 ]
 
-# =========================
+# ========================
+# APPLICATIONS
+# ========================
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+
+    
+    # CLOUDINARY APPS 
+    'cloudinary_storage', 
+    'django.contrib.staticfiles', # Apparaît UNE SEULE FOIS
+    'cloudinary',
+
+    # Apps tierces
+    'rest_framework',
+    'corsheaders',
+    'admin_panel',
+]
+
+
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
+
+
+
+
+# ========================
 # MIDDLEWARE
 # =========================
 MIDDLEWARE = [

@@ -4,6 +4,7 @@ from django.http import JsonResponse
 from django.conf import settings
 from django.conf.urls.static import static
 # from accounts.views import activate_account_page
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 def home(request):
     return JsonResponse({"success": True, "message": "TEKTAL API is running"})
@@ -17,6 +18,17 @@ urlpatterns = [
     path("api/auth/", include("djoser.urls.jwt")),
     #  Endpoints de l’app paths
     path("api/", include("paths.urls")),  # <--- on inclut ici
+
+
+    path('admin/', admin.site.urls),
+
+    # JWT endpoints
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    # Routes de l'app admin_panel
+    path('admin-panel/', include('admin_panel.urls')),
+
 ]
 
 # Servir les médias en dev
