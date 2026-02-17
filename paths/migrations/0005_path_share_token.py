@@ -4,14 +4,30 @@ import uuid
 from django.db import migrations, models
 
 
+def generate_unique_tokens(apps, schema_editor):
+    Path = apps.get_model('paths', 'Path')
+    for path in Path.objects.all():
+        path.share_token = uuid.uuid4()
+        path.save(update_fields=['share_token'])
+
+
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('paths', '0004_savedpath'),
+        ('paths', '0004_savedpath'),  # ✅ inchangé
     ]
 
     operations = [
+        # Étape 1 : ajouter le champ sans contrainte unique
         migrations.AddField(
+            model_name='path',
+            name='share_token',
+            field=models.UUIDField(null=True),
+        ),
+        # Étape 2 : remplir chaque ligne avec un UUID unique
+        migrations.RunPython(generate_unique_tokens, migrations.RunPython.noop),
+        # Étape 3 : appliquer unique=True et editable=False
+        migrations.AlterField(
             model_name='path',
             name='share_token',
             field=models.UUIDField(default=uuid.uuid4, editable=False, unique=True),
