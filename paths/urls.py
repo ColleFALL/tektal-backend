@@ -8,7 +8,8 @@ urlpatterns = [
     path('paths/<int:pk>/', PathDetailView.as_view(), name='path-detail'),  # <- à ajouter
     path('paths/<int:path_id>/favorite/', FavoriteToggleView.as_view(), name='path-favorite'),
     path('users/me/favorites/', FavoriteListView.as_view(), name='user-favorites'),
-    path('share/<int:id>/', SharePathView.as_view(), name='share-path'),
+    # path('share/<int:id>/', SharePathView.as_view(), name='share-path'),
+    path('share/<uuid:share_token>/', SharePathView.as_view(), name='share-path'),  #  UUID
 
 ]
 

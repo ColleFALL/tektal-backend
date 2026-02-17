@@ -1,5 +1,7 @@
 from django.db import models
 from django.conf import settings
+import uuid
+
 
 
 class Path(models.Model):
@@ -37,6 +39,9 @@ class Path(models.Model):
         choices=STATUS_CHOICES,
         default='draft'
     )
+
+    # 🔗 Token de partage unique et permanent
+    share_token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
 
