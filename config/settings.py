@@ -5,6 +5,8 @@ from pathlib import Path
 
 import dj_database_url
 from dotenv import load_dotenv
+import cloudinary
+
 
 load_dotenv()
 
@@ -172,7 +174,6 @@ MEDIA_ROOT = BASE_DIR / "media"
 # CLOUDINARY
 # (si upload direct mobile : pas obligatoire, mais OK à garder)
 # =========================
-import cloudinary
 
 CLOUDINARY_CLOUD_NAME = os.environ.get("CLOUDINARY_CLOUD_NAME")
 CLOUDINARY_API_KEY = os.environ.get("CLOUDINARY_API_KEY")
@@ -185,8 +186,15 @@ if CLOUDINARY_CLOUD_NAME and CLOUDINARY_API_KEY and CLOUDINARY_API_SECRET:
         api_secret=CLOUDINARY_API_SECRET,
         secure=True,
     )
-    DEFAULT_FILE_STORAGE = "cloudinary_storage.storage.MediaCloudinaryStorage"
-
+# ✅ Compatibilité Django 6.0 + cloudinary_storage
+STORAGES = {
+    "default": {
+        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
+    },
+    "staticfiles": {
+        "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
+    },
+}
 # =========================
 # REST FRAMEWORK
 # =========================
