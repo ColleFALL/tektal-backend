@@ -8,4 +8,5 @@ urlpatterns = [
     path('api/paths/reject/<int:pk>/', api_views.PathRejectView.as_view(), name='paths-reject'),
     path('api/paths/public/', api_views.PublicPathListAPI.as_view(), name='paths-public'),
     path('api/users/connected/', api_views.ConnectedUsersView.as_view(), name='users-connected'),
+    path('api/admin/login/', api_views.AdminLoginView.as_view(), name='admin-login'),
 ]
