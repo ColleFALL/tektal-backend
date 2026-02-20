@@ -155,7 +155,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 #     )
 
 # =========================
-# REST FRAMEWORK  ✅ une seule fois avec JWT
+# REST FRAMEWORK  une seule fois avec JWT
 # =========================
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": (
