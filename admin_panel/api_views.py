@@ -58,6 +58,30 @@ class PathListView(APIView):
             })
         return Response(data)
 
+    def post(self, request):
+        title = request.data.get("title")
+        type_parcours = request.data.get("type_parcours")
+        video_url = request.data.get("video_url")
+
+        if not title or not type_parcours or not video_url:
+            return Response({"error": "Champs manquants"}, status=status.HTTP_400_BAD_REQUEST)
+
+        path = Path.objects.create(
+            title=title,
+            type_parcours=type_parcours,
+            video_url=video_url,
+            author=request.user,
+            status="PENDING"
+        )
+        return Response({
+            "id": path.id,
+            "title": path.title,
+            "type_parcours": path.type_parcours,
+            "status": path.status,
+            "author": path.author.username,
+            "views": path.views,
+        }, status=status.HTTP_201_CREATED)
+
 class PathDetailView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
