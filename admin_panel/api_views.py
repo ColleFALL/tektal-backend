@@ -35,7 +35,7 @@ class AdminLoginView(APIView):
             "refresh": str(refresh),
         })
 
-# PATHS ADMIN (PROTÉGÉ)
+# PATHS ADMIN
 class PathListView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
@@ -54,6 +54,7 @@ class PathListView(APIView):
                 "status": path.status,
                 "author": path.author.username,
                 "steps": steps_data,
+                "views": path.views,
             })
         return Response(data)
 
@@ -73,6 +74,7 @@ class PathDetailView(APIView):
             "status": path.status,
             "author": path.author.username,
             "steps": steps_data,
+            "views": path.views,
         }
         return Response(data)
 
@@ -106,12 +108,13 @@ class PublicPathListAPI(APIView):
                 "title": p.title,
                 "video_url": p.video_url,
                 "author": p.author.username,
+                "views": p.views,
             }
             for p in paths
         ]
         return Response(data)
 
-# UTILISATEURS CONNECTÉS (ADMIN)
+# UTILISATEURS
 class ConnectedUsersView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
@@ -127,3 +130,25 @@ class ConnectedUsersView(APIView):
             for user in users
         ]
         return Response(data)
+
+class UserDeleteView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminRole]
+
+    def delete(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        user.delete()
+        return Response({"status": "deleted"})
+
+class UserToggleAdminView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminRole]
+
+    def post(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        if user.role == "admin":
+            user.role = "participant"
+            user.is_staff = False
+        else:
+            user.role = "admin"
+            user.is_staff = True
+        user.save()
+        return Response({"role": user.role})
