@@ -2,28 +2,51 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from django.contrib.auth.models import User
 from django.shortcuts import get_object_or_404
-
+from django.contrib.auth import authenticate, get_user_model
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Path
 from .permissions import IsAdminRole
 
+User = get_user_model()
 
+# LOGIN ADMIN
+class AdminLoginView(APIView):
+    permission_classes = [AllowAny]
 
-#  PATHS ADMIN (PROTÉGÉ)
+    def post(self, request):
+        email = request.data.get("email")
+        password = request.data.get("password")
+
+        try:
+            User.objects.get(email=email)
+        except User.DoesNotExist:
+            return Response({"error": "Identifiants incorrects"}, status=status.HTTP_401_UNAUTHORIZED)
+
+        user = authenticate(username=email, password=password)
+        if user is None:
+            return Response({"error": "Identifiants incorrects"}, status=status.HTTP_401_UNAUTHORIZED)
+        if not user.is_staff:
+            return Response({"error": "Accès réservé aux admins"}, status=status.HTTP_403_FORBIDDEN)
+
+        refresh = RefreshToken.for_user(user)
+        return Response({
+            "access": str(refresh.access_token),
+            "refresh": str(refresh),
+        })
+
+# PATHS ADMIN
 class PathListView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
     def get(self, request):
         paths = Path.objects.all()
         data = []
-
         for path in paths:
             steps_data = [
                 {"order": s.order, "instruction": s.instruction}
                 for s in path.steps.all()
             ]
-
             data.append({
                 "id": path.id,
                 "title": path.title,
@@ -31,22 +54,19 @@ class PathListView(APIView):
                 "status": path.status,
                 "author": path.author.username,
                 "steps": steps_data,
+                "views": path.views,
             })
-
         return Response(data)
-
 
 class PathDetailView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
     def get(self, request, pk):
         path = get_object_or_404(Path, pk=pk)
-
         steps_data = [
             {"order": s.order, "instruction": s.instruction}
             for s in path.steps.all()
         ]
-
         data = {
             "id": path.id,
             "title": path.title,
@@ -54,10 +74,9 @@ class PathDetailView(APIView):
             "status": path.status,
             "author": path.author.username,
             "steps": steps_data,
+            "views": path.views,
         }
-
         return Response(data)
-
 
 class PathApproveView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
@@ -68,7 +87,6 @@ class PathApproveView(APIView):
         path.save()
         return Response({"status": "approved"})
 
-
 class PathRejectView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
@@ -78,30 +96,25 @@ class PathRejectView(APIView):
         path.save()
         return Response({"status": "rejected"})
 
-
-
-#  PATHS PUBLICS
+# PATHS PUBLICS
 class PublicPathListAPI(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
         paths = Path.objects.filter(status="APPROVED")
-
         data = [
             {
                 "id": p.id,
                 "title": p.title,
                 "video_url": p.video_url,
                 "author": p.author.username,
+                "views": p.views,
             }
             for p in paths
         ]
-
         return Response(data)
 
-
-
-#  UTILISATEURS CONNECTÉS (ADMIN)
+# UTILISATEURS
 class ConnectedUsersView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
@@ -116,5 +129,26 @@ class ConnectedUsersView(APIView):
             }
             for user in users
         ]
-
         return Response(data)
+
+class UserDeleteView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminRole]
+
+    def delete(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        user.delete()
+        return Response({"status": "deleted"})
+
+class UserToggleAdminView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminRole]
+
+    def post(self, request, pk):
+        user = get_object_or_404(User, pk=pk)
+        if user.role == "admin":
+            user.role = "participant"
+            user.is_staff = False
+        else:
+            user.role = "admin"
+            user.is_staff = True
+        user.save()
+        return Response({"role": user.role})

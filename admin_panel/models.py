@@ -1,6 +1,5 @@
-
 from django.db import models
-from django.conf import settings  # ✅ remplace l'import direct de User
+from django.conf import settings
 
 STATUS_CHOICES = [
     ('PENDING', 'En attente'),
@@ -18,15 +17,15 @@ class Path(models.Model):
     type_parcours = models.CharField(max_length=50, choices=TYPE_CHOICES)
     video_url = models.URLField()
     author = models.ForeignKey(
-        settings.AUTH_USER_MODEL,  # ✅ au lieu de User directement
+        settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
     )
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING')
     created_at = models.DateTimeField(auto_now_add=True)
+    views = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.title
-
 
 class Step(models.Model):
     path = models.ForeignKey(Path, on_delete=models.CASCADE, related_name='steps')
