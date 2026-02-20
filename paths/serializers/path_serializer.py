@@ -7,6 +7,7 @@ class StepSerializer(serializers.ModelSerializer):
     class Meta:
         model = Step
         fields = ['id', 'step_number', 'start_time', 'end_time', 'text', 'created_at']
+        read_only_fields = ['id', 'created_at']
 
 class PathSerializer(serializers.ModelSerializer):
     steps = StepSerializer(many=True, read_only=True)

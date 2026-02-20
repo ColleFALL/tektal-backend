@@ -228,7 +228,7 @@ CORS_ALLOW_CREDENTIALS = False
 CSRF_TRUSTED_ORIGINS = [
     "https://tektal-backend.onrender.com",
     "https://tektal-web-appli.vercel.app",  # ✅ ajouter
-    # "https://active-tektal.vercel.app"
+    "https://active-tektal.vercel.app"
 
 ]
 

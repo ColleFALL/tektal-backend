@@ -1,8 +1,60 @@
+# from rest_framework import generics, permissions
+# from rest_framework.pagination import PageNumberPagination  # <- ajouté
+# from paths.models import Path
+# from paths.serializers.path_create_serializer import PathCreateSerializer
+# from paths.serializers.path_serializer import PathSerializer
+
+
+# class PathCreateView(generics.CreateAPIView):
+#     serializer_class = PathCreateSerializer
+#     permission_classes = [permissions.IsAuthenticated]
+
+#     def perform_create(self, serializer):
+#         # ⚡ On ne passe plus `user`, le serializer s'en occupe
+#         # Si tu veux publier directement, tu peux décommenter la ligne suivante :
+#         # serializer.save(status="published")
+#         pass  # obligatoire si méthode vide
+
+
+# # ⚡ AJOUT : Pagination standard pour feed
+# class StandardResultsSetPagination(PageNumberPagination):
+#     page_size = 10
+#     page_size_query_param = 'page_size'
+#     max_page_size = 50
+
+
+# # ⚡ AJOUT : Feed avec filtre et pagination
+# class PathListView(generics.ListAPIView):
+#     serializer_class = PathSerializer
+#     permission_classes = [permissions.AllowAny]
+#     pagination_class = StandardResultsSetPagination  # <- ajouté
+
+#     def get_queryset(self):
+#         # queryset = Path.objects.filter(status='published')
+#         queryset = Path.objects.filter(status='APPROVED')
+#         campus_id = self.request.query_params.get('campus_id')  # <- filtrage facultatif
+#         if campus_id:
+#             queryset = queryset.filter(campus_id=campus_id)
+#         return queryset.order_by('-created_at')  # <- tri par date décroissante
+
+
+# # ⚡ AJOUT : Endpoint détail chemin
+# class PathDetailView(generics.RetrieveAPIView):
+#     serializer_class = PathSerializer
+#     permission_classes = [permissions.AllowAny]
+#     # queryset = Path.objects.filter(status='published')
+#     queryset = Path.objects.filter(status='APPROVED')
 from rest_framework import generics, permissions
-from rest_framework.pagination import PageNumberPagination  # <- ajouté
+from rest_framework.pagination import PageNumberPagination
 from paths.models import Path
 from paths.serializers.path_create_serializer import PathCreateSerializer
 from paths.serializers.path_serializer import PathSerializer
+
+
+class StandardResultsSetPagination(PageNumberPagination):
+    page_size = 10
+    page_size_query_param = 'page_size'
+    max_page_size = 50
 
 
 class PathCreateView(generics.CreateAPIView):
@@ -10,35 +62,23 @@ class PathCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        # ⚡ On ne passe plus `user`, le serializer s'en occupe
-        # Si tu veux publier directement, tu peux décommenter la ligne suivante :
-        # serializer.save(status="published")
-        pass  # obligatoire si méthode vide
+        serializer.save(author=self.request.user, status='PENDING')
 
 
-# ⚡ AJOUT : Pagination standard pour feed
-class StandardResultsSetPagination(PageNumberPagination):
-    page_size = 10
-    page_size_query_param = 'page_size'
-    max_page_size = 50
-
-
-# ⚡ AJOUT : Feed avec filtre et pagination
 class PathListView(generics.ListAPIView):
     serializer_class = PathSerializer
     permission_classes = [permissions.AllowAny]
-    pagination_class = StandardResultsSetPagination  # <- ajouté
+    pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
-        queryset = Path.objects.filter(status='published')
-        campus_id = self.request.query_params.get('campus_id')  # <- filtrage facultatif
+        queryset = Path.objects.filter(status='APPROVED')
+        campus_id = self.request.query_params.get('campus_id')
         if campus_id:
             queryset = queryset.filter(campus_id=campus_id)
-        return queryset.order_by('-created_at')  # <- tri par date décroissante
+        return queryset.order_by('-created_at')
 
 
-# ⚡ AJOUT : Endpoint détail chemin
 class PathDetailView(generics.RetrieveAPIView):
     serializer_class = PathSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = Path.objects.filter(status='published')
+    queryset = Path.objects.filter(status='APPROVED')
