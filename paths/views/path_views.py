@@ -62,7 +62,7 @@ class PathCreateView(generics.CreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user, status='PENDING')
+        serializer.save(author=self.request.user, status='APPROVED')
 
 
 class PathListView(generics.ListAPIView):
