@@ -185,7 +185,7 @@ SITE_NAME = os.environ.get("SITE_NAME", "TEKTAL")
 PROTOCOL = os.environ.get("PROTOCOL", ("https" if not DEBUG else "http"))
 
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://active-tektal.vercel.app")
-
+WEBAPP_URL = os.environ.get("WEBAPP_URL", "https://tektal-web-appli.vercel.app")
 DJOSER = {
     "LOGIN_FIELD": "email",
     "USER_CREATE_PASSWORD_RETYPE": False,
