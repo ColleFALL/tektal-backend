@@ -59,3 +59,4 @@ class PathSerializer(serializers.ModelSerializer):
                     "Le start_time doit être inférieur au end_time."
                 )
         return data
+
