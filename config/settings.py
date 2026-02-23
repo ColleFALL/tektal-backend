@@ -495,17 +495,20 @@ BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
 # =========================
 # CORS
 # =========================
-CORS_ALLOWED_ORIGINS = os.environ.get(
-    "CORS_ALLOWED_ORIGINS",
-    "http://localhost:5173,http://localhost:3000,https://active-tektal.vercel.app"
-).split(",")
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://active-tektal.vercel.app",
+    "https://admin-panel-gamma-liart.vercel.app",
+    "https://tektal-backend.onrender.com",
+]
 
 CORS_ALLOW_CREDENTIALS = False
 
 CSRF_TRUSTED_ORIGINS = [
     "https://tektal-backend.onrender.com",
+    "https://admin-panel-gamma-liart.vercel.app",
 ]
-
 # =========================
 # LOGGING
 # =========================
