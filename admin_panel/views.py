@@ -115,7 +115,7 @@ class RejectPathAPI(APIView):
 
 
 # =============================
-# PARCOURS PUBLICS
+# PARCOURS 
 # =============================
 class PublicPathListAPI(APIView):
 
