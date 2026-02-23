@@ -184,8 +184,8 @@
 # # JWT
 # # =========================
 # SIMPLE_JWT = {
-#     "ACCESS_TOKEN_LIFETIME": timedelta(hours=6),
-#     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+#     "ACCESS_TOKEN_LIFETIME": timedelta(hours=24),
+#     "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
 #     "ROTATE_REFRESH_TOKENS": True,
 #     "BLACKLIST_AFTER_ROTATION": True,
 #     "AUTH_HEADER_TYPES": ("Bearer",),
@@ -249,14 +249,14 @@
 
 # # =========================
 # # CORS
-# # =========================
- CORS_ALLOWED_ORIGINS = os.environ.get(
-    "CORS_ALLOWED_ORIGINS",
-    "http://localhost:5173,"
-    "http://localhost:3000,"
-    "https://active-tektal.vercel.app,"
-    "https://tektal-admin-five.vercel.app"
- ).split(",")
+# # # =========================
+#  CORS_ALLOWED_ORIGINS = os.environ.get(
+#     "CORS_ALLOWED_ORIGINS",
+#     "http://localhost:5173,http://localhost:3000,https://active-tektal.vercel.app"
+#     "http://localhost:3000,"
+#     "https://active-tektal.vercel.app,"
+#     "https://tektal-admin-five.vercel.app"
+#  ).split(",")
 
 # CORS_ALLOW_CREDENTIALS = False
 
@@ -449,8 +449,8 @@ REST_FRAMEWORK = {
 # JWT
 # =========================
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(hours=6),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=1),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=30),
     "ROTATE_REFRESH_TOKENS": True,
     "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
