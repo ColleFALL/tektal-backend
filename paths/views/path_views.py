@@ -1,4 +1,4 @@
- queryset = Path.objects.filter(status='APPROVED')
+#  queryset = Path.objects.filter(status='APPROVED')
 from rest_framework import generics, permissions
 from rest_framework.pagination import PageNumberPagination
 from paths.models import Path
