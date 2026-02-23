@@ -222,6 +222,7 @@ CORS_ALLOWED_ORIGINS = os.environ.get(
     "CORS_ALLOWED_ORIGINS",
     "http://localhost:5173,http://localhost:3000,https://active-tektal.vercel.app,https://tektal-web-appli.vercel.app,https://tektal-administration.vercel.app,https://tektal-backend.onrender.com"
 ).split(",")
+CORS_ALLOWED_ORIGINS
 
 CORS_ALLOW_CREDENTIALS = False
 
