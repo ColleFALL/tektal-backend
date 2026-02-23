@@ -10,7 +10,10 @@ from .permissions import IsAdminRole
 
 User = get_user_model()
 
+
+# =============================
 # LOGIN ADMIN
+# =============================
 class AdminLoginView(APIView):
     permission_classes = [AllowAny]
 
@@ -35,7 +38,32 @@ class AdminLoginView(APIView):
             "refresh": str(refresh),
         })
 
+
+# =============================
+# SETUP ADMIN (temporaire)
+# =============================
+class SetupAdminView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        secret = request.query_params.get("secret")
+        if secret != "tektal2026":
+            return Response({"error": "Non autorisé"}, status=403)
+
+        user, created = User.objects.get_or_create(email="admin@tektal.com")
+        user.is_active = True
+        user.is_staff = True
+        user.is_superuser = True
+        user.role = "admin"
+        user.set_password("Admin12345")
+        user.save()
+
+        return Response({"message": "Admin créé" if created else "Admin mis à jour"})
+
+
+# =============================
 # PATHS ADMIN
+# =============================
 class PathListView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
@@ -76,11 +104,9 @@ class PathListView(APIView):
         return Response({
             "id": path.id,
             "title": path.title,
-            "type_parcours": path.type_parcours,
             "status": path.status,
-            "author": path.author.username,
-            "views": path.views,
         }, status=status.HTTP_201_CREATED)
+
 
 class PathDetailView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
@@ -91,7 +117,7 @@ class PathDetailView(APIView):
             {"order": s.order, "instruction": s.instruction}
             for s in path.steps.all()
         ]
-        data = {
+        return Response({
             "id": path.id,
             "title": path.title,
             "type_parcours": path.type_parcours,
@@ -99,8 +125,8 @@ class PathDetailView(APIView):
             "author": path.author.username,
             "steps": steps_data,
             "views": path.views,
-        }
-        return Response(data)
+        })
+
 
 class PathApproveView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
@@ -111,6 +137,7 @@ class PathApproveView(APIView):
         path.save()
         return Response({"status": "approved"})
 
+
 class PathRejectView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
@@ -120,7 +147,10 @@ class PathRejectView(APIView):
         path.save()
         return Response({"status": "rejected"})
 
+
+# =============================
 # PATHS PUBLICS
+# =============================
 class PublicPathListAPI(APIView):
     permission_classes = [AllowAny]
 
@@ -138,7 +168,10 @@ class PublicPathListAPI(APIView):
         ]
         return Response(data)
 
+
+# =============================
 # UTILISATEURS
+# =============================
 class ConnectedUsersView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
@@ -155,13 +188,20 @@ class ConnectedUsersView(APIView):
         ]
         return Response(data)
 
+
 class UserDeleteView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
     def delete(self, request, pk):
         user = get_object_or_404(User, pk=pk)
+        if user.is_superuser:
+            return Response(
+                {"error": "Impossible de supprimer un superadmin."},
+                status=status.HTTP_403_FORBIDDEN
+            )
         user.delete()
         return Response({"status": "deleted"})
+
 
 class UserToggleAdminView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
