@@ -14,13 +14,12 @@ User = get_user_model()
 # LOGIN ADMIN
 # =============================
 class AdminLoginView(APIView):
-    permission_classes = [AllowAny]  # OBLIGATOIRE sinon 403
+    permission_classes = [AllowAny]  # Obligatoire sinon 403
 
     def post(self, request):
         email = request.data.get("email")
         password = request.data.get("password")
 
-        # Vérifie que l'utilisateur existe
         # 1️⃣ Vérification des champs
         if not email or not password:
             return Response(
@@ -28,27 +27,7 @@ class AdminLoginView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # 2️⃣ Vérifie si l'utilisateur existe
-
-        try:
-            user = User.objects.get(email=email)
-        except User.DoesNotExist:
-            return Response(
-                {"error": "Identifiants incorrects."},
-                status=status.HTTP_401_UNAUTHORIZED
-            )
-
-        # Authenticate correctement avec USERNAME_FIELD
-        user = authenticate(username=email, password=password)
-        if user is None:
-            return Response({"error": "Identifiants incorrects"}, status=status.HTTP_401_UNAUTHORIZED)
-
-        # Vérifie que l'utilisateur est staff ET rôle admin
-        if not user.is_staff or getattr(user, "role", None) != "admin":
-            return Response({"error": "Accès réservé aux admins"}, status=status.HTTP_403_FORBIDDEN)
-
-        # Génère les tokens JWT
-        # 3️⃣ Authentification
+        # 2️⃣ Authentification
         user = authenticate(request, username=email, password=password)
         if user is None:
             return Response(
@@ -56,14 +35,14 @@ class AdminLoginView(APIView):
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
-        # 4️⃣ Vérifie que c'est un admin
-        if not user.is_staff:
+        # 3️⃣ Vérifie que c'est un admin
+        if not user.is_staff or getattr(user, "role", None) != "admin":
             return Response(
                 {"error": "Accès réservé aux administrateurs."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # 5️⃣ Génération JWT
+        # 4️⃣ Génération des tokens JWT
         refresh = RefreshToken.for_user(user)
 
         return Response({
@@ -81,27 +60,27 @@ class AdminLoginView(APIView):
 # =============================
 # SETUP ADMIN (temporaire)
 # =============================
-class SetupAdminView(APIView):
-    permission_classes = [AllowAny]
+# class SetupAdminView(APIView):
+#     permission_classes = [AllowAny]
 
-    def get(self, request):
-        secret = request.query_params.get("secret")
-        if secret != "tektal2026":
-            return Response({"error": "Non autorisé"}, status=403)
+#     def get(self, request):
+#         secret = request.query_params.get("secret")
+#         if secret != "tektal2026":
+#             return Response({"error": "Non autorisé"}, status=403)
 
-        user, created = User.objects.get_or_create(
-            email="admin@tektal.com",
-            defaults={"username": "admin"}
-        )
-        user.username = "admin"
-        user.is_active = True
-        user.is_staff = True
-        user.is_superuser = True
-        user.role = "admin"
-        user.set_password("Admin12345")
-        user.save()
+#         user, created = User.objects.get_or_create(
+#             email="admin@tektal.com",
+#             defaults={"username": "admin"}
+#         )
+#         user.username = "admin"
+#         user.is_active = True
+#         user.is_staff = True
+#         user.is_superuser = True
+#         user.role = "admin"
+#         user.set_password("Admin12345")
+#         user.save()
 
-        return Response({"message": "Admin créé" if created else "Admin mis à jour"})
+#         return Response({"message": "Admin créé" if created else "Admin mis à jour"})
 
 
 # =============================
