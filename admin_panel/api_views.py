@@ -80,7 +80,11 @@ class SetupAdminView(APIView):
         user.set_password("Admin12345")
         user.save()
 
-        return Response({"message": "Admin créé" if created else "Admin mis à jour"})
+        return Response({
+    "message": "Admin créé" if created else "Admin mis à jour",
+    "role": user.role,
+    "is_staff": user.is_staff,
+})
 
 
 # =============================
