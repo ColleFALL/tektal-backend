@@ -30,17 +30,12 @@ class AdminLoginView(APIView):
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
+        # ✅ Une seule vérification
         if not user.is_staff and getattr(user, "role", None) != "admin":
             return Response(
                 {"error": "Accès réservé aux administrateurs."},
                 status=status.HTTP_403_FORBIDDEN
             )
-        # 3️⃣ Vérifie que c'est un admin
-        if not user.is_staff or str(getattr(user, "role", "")).lower() != "admin":
-         return Response(
-         {"error": "Accès réservé aux administrateurs."},
-         status=status.HTTP_403_FORBIDDEN
-        )
 
         refresh = RefreshToken.for_user(user)
         return Response({
@@ -65,7 +60,7 @@ class SetupAdminView(APIView):
             return Response({"error": "Non autorisé"}, status=403)
 
         user, created = User.objects.get_or_create(
-            email="admintest@tektal.com",
+            email="admin@tektal.com",
             defaults={"username": "admin"}
         )
         user.username = "admin"
@@ -73,7 +68,7 @@ class SetupAdminView(APIView):
         user.is_staff = True
         user.is_superuser = True
         user.role = "admin"
-        user.set_password("Admin123456")
+        user.set_password("Admin12345")
         user.save()
 
         return Response({
@@ -94,12 +89,7 @@ class PathListView(APIView):
                 {"order": s.order, "instruction": s.instruction}
                 for s in path.steps.all()
             ]
-            # ✅ Retourne video ou video_url selon ce qui existe
-            video = None
-            if path.video:
-                video = request.build_absolute_uri(path.video.url)
-            elif path.video_url:
-                video = path.video_url
+            video = path.video_url or None
 
             data.append({
                 "id": path.id,
@@ -109,15 +99,14 @@ class PathListView(APIView):
                 "author": path.author.username,
                 "steps": steps_data,
                 "views": path.views,
-                "video": video,
+                "video_url": video,
             })
         return Response(data)
 
     def post(self, request):
         title = request.data.get("title")
         type_parcours = request.data.get("type_parcours")
-        video_url = request.data.get("video_url", "")
-        video = request.FILES.get("video")  # ✅ fichier uploadé
+        video_url = request.data.get("video_url", "")  # ✅ URL Cloudinary
 
         if not title or not type_parcours:
             return Response(
@@ -129,7 +118,6 @@ class PathListView(APIView):
             title=title,
             type_parcours=type_parcours,
             video_url=video_url,
-            video=video,
             author=request.user,
             status="PENDING"
         )
@@ -137,6 +125,7 @@ class PathListView(APIView):
             "id": path.id,
             "title": path.title,
             "status": path.status,
+            "video_url": path.video_url,
         }, status=status.HTTP_201_CREATED)
 
 
@@ -149,12 +138,6 @@ class PathDetailView(APIView):
             {"order": s.order, "instruction": s.instruction}
             for s in path.steps.all()
         ]
-        video = None
-        if path.video:
-            video = request.build_absolute_uri(path.video.url)
-        elif path.video_url:
-            video = path.video_url
-
         return Response({
             "id": path.id,
             "title": path.title,
@@ -163,7 +146,7 @@ class PathDetailView(APIView):
             "author": path.author.username,
             "steps": steps_data,
             "views": path.views,
-            "video": video,
+            "video_url": path.video_url,
         })
 
 
@@ -192,20 +175,16 @@ class PublicPathListAPI(APIView):
 
     def get(self, request):
         paths = Path.objects.filter(status="APPROVED")
-        data = []
-        for p in paths:
-            video = None
-            if p.video:
-                video = request.build_absolute_uri(p.video.url)
-            elif p.video_url:
-                video = p.video_url
-            data.append({
+        data = [
+            {
                 "id": p.id,
                 "title": p.title,
-                "video": video,
+                "video_url": p.video_url,
                 "author": p.author.username,
                 "views": p.views,
-            })
+            }
+            for p in paths
+        ]
         return Response(data)
 
 
@@ -245,21 +224,16 @@ class UserToggleAdminView(APIView):
 
     def post(self, request, pk):
         user = get_object_or_404(User, pk=pk)
-
         if user.is_superuser:
-            # On ne touche pas au superadmin
             return Response(
-                {"role": user.role, "message": "Impossible de modifier le superadmin."},
+                {"error": "Impossible de modifier le superadmin."},
                 status=status.HTTP_403_FORBIDDEN
             )
-
-        # Toggle role et is_staff pour les autres utilisateurs
         if user.role == "admin":
             user.role = "participant"
             user.is_staff = False
         else:
             user.role = "admin"
             user.is_staff = True
-
         user.save()
         return Response({"role": user.role})
