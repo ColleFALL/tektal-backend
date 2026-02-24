@@ -88,6 +88,13 @@ class PathListView(APIView):
                 {"order": s.order, "instruction": s.instruction}
                 for s in path.steps.all()
             ]
+            # ✅ Retourne video ou video_url selon ce qui existe
+            video = None
+            if path.video:
+                video = request.build_absolute_uri(path.video.url)
+            elif path.video_url:
+                video = path.video_url
+
             data.append({
                 "id": path.id,
                 "title": path.title,
@@ -96,14 +103,15 @@ class PathListView(APIView):
                 "author": path.author.username,
                 "steps": steps_data,
                 "views": path.views,
-                "video_url": path.video_url,
+                "video": video,
             })
         return Response(data)
 
     def post(self, request):
         title = request.data.get("title")
         type_parcours = request.data.get("type_parcours")
-        video_url = request.data.get("video_url", "")  # ✅ optionnel
+        video_url = request.data.get("video_url", "")
+        video = request.FILES.get("video")  # ✅ fichier uploadé
 
         if not title or not type_parcours:
             return Response(
@@ -115,6 +123,7 @@ class PathListView(APIView):
             title=title,
             type_parcours=type_parcours,
             video_url=video_url,
+            video=video,
             author=request.user,
             status="PENDING"
         )
@@ -134,6 +143,12 @@ class PathDetailView(APIView):
             {"order": s.order, "instruction": s.instruction}
             for s in path.steps.all()
         ]
+        video = None
+        if path.video:
+            video = request.build_absolute_uri(path.video.url)
+        elif path.video_url:
+            video = path.video_url
+
         return Response({
             "id": path.id,
             "title": path.title,
@@ -142,7 +157,7 @@ class PathDetailView(APIView):
             "author": path.author.username,
             "steps": steps_data,
             "views": path.views,
-            "video_url": path.video_url,
+            "video": video,
         })
 
 
@@ -171,16 +186,20 @@ class PublicPathListAPI(APIView):
 
     def get(self, request):
         paths = Path.objects.filter(status="APPROVED")
-        data = [
-            {
+        data = []
+        for p in paths:
+            video = None
+            if p.video:
+                video = request.build_absolute_uri(p.video.url)
+            elif p.video_url:
+                video = p.video_url
+            data.append({
                 "id": p.id,
                 "title": p.title,
-                "video_url": p.video_url,
+                "video": video,
                 "author": p.author.username,
                 "views": p.views,
-            }
-            for p in paths
-        ]
+            })
         return Response(data)
 
 
