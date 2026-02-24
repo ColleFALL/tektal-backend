@@ -35,6 +35,12 @@ class AdminLoginView(APIView):
                 {"error": "Accès réservé aux administrateurs."},
                 status=status.HTTP_403_FORBIDDEN
             )
+        # 3️⃣ Vérifie que c'est un admin
+        if not user.is_staff or str(getattr(user, "role", "")).lower() != "admin":
+         return Response(
+         {"error": "Accès réservé aux administrateurs."},
+         status=status.HTTP_403_FORBIDDEN
+        )
 
         refresh = RefreshToken.for_user(user)
         return Response({
@@ -59,7 +65,7 @@ class SetupAdminView(APIView):
             return Response({"error": "Non autorisé"}, status=403)
 
         user, created = User.objects.get_or_create(
-            email="admin@tektal.com",
+            email="admintest@tektal.com",
             defaults={"username": "admin"}
         )
         user.username = "admin"
@@ -67,7 +73,7 @@ class SetupAdminView(APIView):
         user.is_staff = True
         user.is_superuser = True
         user.role = "admin"
-        user.set_password("Admin12345")
+        user.set_password("Admin123456")
         user.save()
 
         return Response({
@@ -239,11 +245,21 @@ class UserToggleAdminView(APIView):
 
     def post(self, request, pk):
         user = get_object_or_404(User, pk=pk)
+
+        if user.is_superuser:
+            # On ne touche pas au superadmin
+            return Response(
+                {"role": user.role, "message": "Impossible de modifier le superadmin."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Toggle role et is_staff pour les autres utilisateurs
         if user.role == "admin":
             user.role = "participant"
             user.is_staff = False
         else:
             user.role = "admin"
             user.is_staff = True
+
         user.save()
         return Response({"role": user.role})
