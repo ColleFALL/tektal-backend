@@ -36,11 +36,11 @@ class AdminLoginView(APIView):
             )
 
         # 3️⃣ Vérifie que c'est un admin
-        if not user.is_staff or getattr(user, "role", None) != "admin":
-            return Response(
-                {"error": "Accès réservé aux administrateurs."},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        if not user.is_staff or str(getattr(user, "role", "")).lower() != "admin":
+         return Response(
+         {"error": "Accès réservé aux administrateurs."},
+         status=status.HTTP_403_FORBIDDEN
+        )
 
         # 4️⃣ Génération des tokens JWT
         refresh = RefreshToken.for_user(user)
