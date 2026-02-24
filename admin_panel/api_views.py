@@ -50,7 +50,11 @@ class SetupAdminView(APIView):
         if secret != "tektal2026":
             return Response({"error": "Non autorisé"}, status=403)
 
-        user, created = User.objects.get_or_create(email="admin@tektal.com")
+        user, created = User.objects.get_or_create(
+            email="admin@tektal.com",
+            defaults={"username": "admin"}
+        )
+        user.username = "admin"
         user.is_active = True
         user.is_staff = True
         user.is_superuser = True
@@ -59,8 +63,6 @@ class SetupAdminView(APIView):
         user.save()
 
         return Response({"message": "Admin créé" if created else "Admin mis à jour"})
-
-
 # =============================
 # PATHS ADMIN
 # =============================
