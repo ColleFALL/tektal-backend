@@ -234,11 +234,21 @@ class UserToggleAdminView(APIView):
 
     def post(self, request, pk):
         user = get_object_or_404(User, pk=pk)
+
+        if user.is_superuser:
+            # On ne touche pas au superadmin
+            return Response(
+                {"role": user.role, "message": "Impossible de modifier le superadmin."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # Toggle role et is_staff pour les autres utilisateurs
         if user.role == "admin":
             user.role = "participant"
             user.is_staff = False
         else:
             user.role = "admin"
             user.is_staff = True
+
         user.save()
         return Response({"role": user.role})
