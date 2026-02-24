@@ -20,14 +20,14 @@ class AdminLoginView(APIView):
         email = request.data.get("email")
         password = request.data.get("password")
 
-        # 1️⃣ Vérification des champs
+        #  Vérification des champs
         if not email or not password:
             return Response(
                 {"error": "Email et mot de passe requis."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        # 2️⃣ Authentification
+        #  Authentification
         user = authenticate(request, username=email, password=password)
         if user is None:
             return Response(
@@ -35,14 +35,14 @@ class AdminLoginView(APIView):
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
-        # 3️⃣ Vérifie que c'est un admin
-        if not user.is_staff or getattr(user, "role", None) != "admin":
-            return Response(
-                {"error": "Accès réservé aux administrateurs."},
-                status=status.HTTP_403_FORBIDDEN
-            )
+        #  Vérifie que c'est un admin
+        if not user.is_staff and getattr(user, "role", None) != "admin":
+    return Response(
+        {"error": "Accès réservé aux administrateurs."},
+        status=status.HTTP_403_FORBIDDEN
+    )
 
-        # 4️⃣ Génération des tokens JWT
+        # Génération des tokens JWT
         refresh = RefreshToken.for_user(user)
 
         return Response({
