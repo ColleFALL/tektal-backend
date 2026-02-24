@@ -10,24 +10,19 @@ from .permissions import IsAdminRole
 
 User = get_user_model()
 
-# =============================
-# LOGIN ADMIN
-# =============================
 class AdminLoginView(APIView):
-    permission_classes = [AllowAny]  # Obligatoire sinon 403
+    permission_classes = [AllowAny]
 
     def post(self, request):
         email = request.data.get("email")
         password = request.data.get("password")
 
-        #  Vérification des champs
         if not email or not password:
             return Response(
                 {"error": "Email et mot de passe requis."},
                 status=status.HTTP_400_BAD_REQUEST
             )
 
-        #  Authentification
         user = authenticate(request, username=email, password=password)
         if user is None:
             return Response(
@@ -35,16 +30,13 @@ class AdminLoginView(APIView):
                 status=status.HTTP_401_UNAUTHORIZED
             )
 
-        #  Vérifie que c'est un admin
         if not user.is_staff and getattr(user, "role", None) != "admin":
-    return Response(
-        {"error": "Accès réservé aux administrateurs."},
-        status=status.HTTP_403_FORBIDDEN
-    )
+            return Response(
+                {"error": "Accès réservé aux administrateurs."},
+                status=status.HTTP_403_FORBIDDEN
+            )
 
-        # Génération des tokens JWT
         refresh = RefreshToken.for_user(user)
-
         return Response({
             "access": str(refresh.access_token),
             "refresh": str(refresh),
@@ -57,9 +49,7 @@ class AdminLoginView(APIView):
             }
         }, status=status.HTTP_200_OK)
 
-# =============================
-# SETUP ADMIN (temporaire)
-# =============================
+
 class SetupAdminView(APIView):
     permission_classes = [AllowAny]
 
@@ -81,15 +71,12 @@ class SetupAdminView(APIView):
         user.save()
 
         return Response({
-    "message": "Admin créé" if created else "Admin mis à jour",
-    "role": user.role,
-    "is_staff": user.is_staff,
-})
+            "message": "Admin créé" if created else "Admin mis à jour",
+            "role": user.role,
+            "is_staff": user.is_staff,
+        })
 
 
-# =============================
-# PATHS ADMIN
-# =============================
 class PathListView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
@@ -109,16 +96,20 @@ class PathListView(APIView):
                 "author": path.author.username,
                 "steps": steps_data,
                 "views": path.views,
+                "video_url": path.video_url,
             })
         return Response(data)
 
     def post(self, request):
         title = request.data.get("title")
         type_parcours = request.data.get("type_parcours")
-        video_url = request.data.get("video_url")
+        video_url = request.data.get("video_url", "")  # ✅ optionnel
 
-        if not title or not type_parcours or not video_url:
-            return Response({"error": "Champs manquants"}, status=status.HTTP_400_BAD_REQUEST)
+        if not title or not type_parcours:
+            return Response(
+                {"error": "Titre et type sont requis."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         path = Path.objects.create(
             title=title,
@@ -151,6 +142,7 @@ class PathDetailView(APIView):
             "author": path.author.username,
             "steps": steps_data,
             "views": path.views,
+            "video_url": path.video_url,
         })
 
 
@@ -174,9 +166,6 @@ class PathRejectView(APIView):
         return Response({"status": "rejected"})
 
 
-# =============================
-# PATHS PUBLICS
-# =============================
 class PublicPathListAPI(APIView):
     permission_classes = [AllowAny]
 
@@ -195,9 +184,6 @@ class PublicPathListAPI(APIView):
         return Response(data)
 
 
-# =============================
-# UTILISATEURS
-# =============================
 class ConnectedUsersView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 

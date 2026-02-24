@@ -15,7 +15,7 @@ TYPE_CHOICES = [
 class Path(models.Model):
     title = models.CharField(max_length=255)
     type_parcours = models.CharField(max_length=50, choices=TYPE_CHOICES)
-    video_url = models.URLField()
+    video_url = models.TextField(blank=True, null=True)  # ✅ TextField au lieu de URLField
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE
