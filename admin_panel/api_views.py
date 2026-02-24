@@ -21,23 +21,27 @@ class AdminLoginView(APIView):
         email = request.data.get("email")
         password = request.data.get("password")
 
+        # Vérifie que l'utilisateur existe
         try:
             User.objects.get(email=email)
         except User.DoesNotExist:
             return Response({"error": "Identifiants incorrects"}, status=status.HTTP_401_UNAUTHORIZED)
 
+        # Authenticate correctement avec USERNAME_FIELD
         user = authenticate(username=email, password=password)
         if user is None:
             return Response({"error": "Identifiants incorrects"}, status=status.HTTP_401_UNAUTHORIZED)
-        if not user.is_staff:
+
+        # Vérifie que l'utilisateur est staff ET rôle admin
+        if not user.is_staff or getattr(user, "role", None) != "admin":
             return Response({"error": "Accès réservé aux admins"}, status=status.HTTP_403_FORBIDDEN)
 
+        # Génère les tokens JWT
         refresh = RefreshToken.for_user(user)
         return Response({
             "access": str(refresh.access_token),
             "refresh": str(refresh),
         })
-
 
 # =============================
 # SETUP ADMIN (temporaire)
