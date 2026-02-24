@@ -69,7 +69,7 @@ class SetupAdminView(APIView):
             return Response({"error": "Non autorisé"}, status=403)
 
         user, created = User.objects.get_or_create(
-            email="admin@tektal.com",
+            email="admintest@tektal.com",
             defaults={"username": "admin"}
         )
         user.username = "admin"
@@ -77,7 +77,7 @@ class SetupAdminView(APIView):
         user.is_staff = True
         user.is_superuser = True
         user.role = "admin"
-        user.set_password("Admin12345")
+        user.set_password("Admin123456")
         user.save()
 
         return Response({
