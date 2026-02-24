@@ -48,7 +48,7 @@ class PathListAPI(APIView):
             type_parcours=type_parcours,
             video_url=video_url,
             author=user,
-            status='PENDING'  # 🔥 Toujours en attente
+            status='PENDING' 
         )
 
         return Response(

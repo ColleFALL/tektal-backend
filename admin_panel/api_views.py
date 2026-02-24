@@ -10,33 +10,61 @@ from .permissions import IsAdminRole
 
 User = get_user_model()
 
-
 # =============================
 # LOGIN ADMIN
 # =============================
 class AdminLoginView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [AllowAny]  # OBLIGATOIRE sinon 403
 
     def post(self, request):
         email = request.data.get("email")
         password = request.data.get("password")
 
+        # 1️⃣ Vérification des champs
+        if not email or not password:
+            return Response(
+                {"error": "Email et mot de passe requis."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # 2️⃣ Vérifie si l'utilisateur existe
         try:
-            User.objects.get(email=email)
+            user = User.objects.get(email=email)
         except User.DoesNotExist:
-            return Response({"error": "Identifiants incorrects"}, status=status.HTTP_401_UNAUTHORIZED)
+            return Response(
+                {"error": "Identifiants incorrects."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
 
-        user = authenticate(username=email, password=password)
+        # 3️⃣ Authentification
+        user = authenticate(request, username=email, password=password)
         if user is None:
-            return Response({"error": "Identifiants incorrects"}, status=status.HTTP_401_UNAUTHORIZED)
-        if not user.is_staff:
-            return Response({"error": "Accès réservé aux admins"}, status=status.HTTP_403_FORBIDDEN)
+            return Response(
+                {"error": "Identifiants incorrects."},
+                status=status.HTTP_401_UNAUTHORIZED
+            )
 
+        # 4️⃣ Vérifie que c'est un admin
+        if not user.is_staff:
+            return Response(
+                {"error": "Accès réservé aux administrateurs."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
+        # 5️⃣ Génération JWT
         refresh = RefreshToken.for_user(user)
+
         return Response({
             "access": str(refresh.access_token),
             "refresh": str(refresh),
-        })
+            "user": {
+                "id": user.id,
+                "email": user.email,
+                "username": user.username,
+                "is_staff": user.is_staff,
+                "role": getattr(user, "role", "participant"),
+            }
+        }, status=status.HTTP_200_OK)
 
 
 # =============================
@@ -63,6 +91,8 @@ class SetupAdminView(APIView):
         user.save()
 
         return Response({"message": "Admin créé" if created else "Admin mis à jour"})
+
+
 # =============================
 # PATHS ADMIN
 # =============================
