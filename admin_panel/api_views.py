@@ -60,27 +60,27 @@ class AdminLoginView(APIView):
 # =============================
 # SETUP ADMIN (temporaire)
 # =============================
-# class SetupAdminView(APIView):
-#     permission_classes = [AllowAny]
+class SetupAdminView(APIView):
+    permission_classes = [AllowAny]
 
-#     def get(self, request):
-#         secret = request.query_params.get("secret")
-#         if secret != "tektal2026":
-#             return Response({"error": "Non autorisé"}, status=403)
+    def get(self, request):
+        secret = request.query_params.get("secret")
+        if secret != "tektal2026":
+            return Response({"error": "Non autorisé"}, status=403)
 
-#         user, created = User.objects.get_or_create(
-#             email="admin@tektal.com",
-#             defaults={"username": "admin"}
-#         )
-#         user.username = "admin"
-#         user.is_active = True
-#         user.is_staff = True
-#         user.is_superuser = True
-#         user.role = "admin"
-#         user.set_password("Admin12345")
-#         user.save()
+        user, created = User.objects.get_or_create(
+            email="admin@tektal.com",
+            defaults={"username": "admin"}
+        )
+        user.username = "admin"
+        user.is_active = True
+        user.is_staff = True
+        user.is_superuser = True
+        user.role = "admin"
+        user.set_password("Admin12345")
+        user.save()
 
-#         return Response({"message": "Admin créé" if created else "Admin mis à jour"})
+        return Response({"message": "Admin créé" if created else "Admin mis à jour"})
 
 
 # =============================
