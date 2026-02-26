@@ -4,7 +4,7 @@ from rest_framework.pagination import PageNumberPagination
 from paths.models import Path
 from paths.serializers.path_create_serializer import PathCreateSerializer
 from paths.serializers.path_serializer import PathSerializer
-
+# from paths.serializers.path_create_serializer import PathSerializer
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 10
