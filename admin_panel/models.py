@@ -6,7 +6,7 @@ STATUS_CHOICES = [
     ('APPROVED', 'Validé'),
     ('REJECTED', 'Refusé'),
 ]
-
+# 
 TYPE_CHOICES = [
     ('DESTINATION', 'Destination'),
     ('ACTIVITY', 'Activité'),
