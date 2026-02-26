@@ -48,7 +48,7 @@ class StepSerializer(serializers.ModelSerializer):
 
 class PathCreateSerializer(serializers.ModelSerializer):
     steps = StepSerializer(many=True)
-    gps_points = GPSPointSerializer(many=True, required=False)gps_points = GPSPointSerializer(many=True, required=False)
+    gps_points = GPSPointSerializer(many=True, required=False)
 
     class Meta:
         model = Path
