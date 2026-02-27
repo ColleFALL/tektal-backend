@@ -79,27 +79,27 @@ class PathCreateSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("La durée de la vidéo doit être supérieure à 0.")
         return value
 
-#     def validate(self, data):
-#         steps = data.get('steps', [])
-#         duration = data.get('duration')
+    def validate(self, data):
+        steps = data.get('steps', [])
+        duration = data.get('duration')
 
-#         if not (2 <= len(steps) <= 6):
-#             raise serializers.ValidationError("Un chemin doit contenir entre 2 et 6 étapes.")
+        if not (2 <= len(steps) <= 6):
+            raise serializers.ValidationError("Un chemin doit contenir entre 2 et 6 étapes.")
 
-#         for step in steps:
-#             if step['start_time'] >= step['end_time']:
-#                 raise serializers.ValidationError("Le start_time doit être inférieur au end_time.")
-#             if duration and step['end_time'] > duration:
-#                 raise serializers.ValidationError("Une étape ne peut pas dépasser la durée totale.")
+        for step in steps:
+            if step['start_time'] >= step['end_time']:
+                raise serializers.ValidationError("Le start_time doit être inférieur au end_time.")
+            if duration and step['end_time'] > duration:
+                raise serializers.ValidationError("Une étape ne peut pas dépasser la durée totale.")
 
-#         return data
+        return data
 
-#     @transaction.atomic
-#     def create(self, validated_data):
-#         steps_data = validated_data.pop('steps', [])
+    @transaction.atomic
+    def create(self, validated_data):
+        steps_data = validated_data.pop('steps', [])
 
-#         # author et status sont injectés par perform_create dans la vue
-#         path = Path.objects.create(**validated_data)
+        # author et status sont injectés par perform_create dans la vue
+        path = Path.objects.create(**validated_data)
     @transaction.atomic
     def create(self, validated_data):
         steps_data = validated_data.pop('steps', [])
