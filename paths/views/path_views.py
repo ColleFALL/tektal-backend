@@ -26,7 +26,7 @@ class PathListView(generics.ListAPIView):
     pagination_class = StandardResultsSetPagination
 
     def get_queryset(self):
-        queryset = Path.objects.filter(status='PUBLISHED')
+        queryset = Path.objects.filter(status='published')
         campus_id = self.request.query_params.get('campus_id')
         if campus_id:
             queryset = queryset.filter(campus_id=campus_id)
@@ -36,4 +36,4 @@ class PathListView(generics.ListAPIView):
 class PathDetailView(generics.RetrieveAPIView):
     serializer_class = PathSerializer
     permission_classes = [permissions.AllowAny]
-    queryset = Path.objects.filter(status='PUBLISHED')
+    queryset = Path.objects.filter(status='published')
