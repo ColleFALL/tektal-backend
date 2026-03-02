@@ -233,20 +233,25 @@ class UserToggleAdminView(APIView):
     def post(self, request, pk):
         user = get_object_or_404(User, pk=pk)
 
+        # Impossible de modifier le superadmin
         if user.is_superuser:
             return Response(
                 {"error": "Impossible de modifier le superadmin."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # 🔹 Récupérer le rôle choisi depuis le frontend
+        # Récupérer le rôle choisi depuis le frontend
         role = request.data.get("role")  # "admin", "establishment" ou "participant"
         if role not in ["admin", "etablissement", "participant"]:
-            return Response({"error": "Rôle invalide"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Rôle invalide. Choisir 'admin', 'establishment' ou 'participant'."}, 
+             status=status.HTTP_400_BAD_REQUEST)
 
+        # Mettre à jour le rôle
         user.role = role
+
         # is_staff uniquement pour admin
         user.is_staff = True if role == "admin" else False
+
         user.save()
 
         return Response({
