@@ -261,3 +261,26 @@ class UserToggleAdminView(APIView):
             "role": user.role,
             "is_staff": user.is_staff
         })
+
+class EtablissementListView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminRole]  # ou IsAdminRole si seulement admin peut voir
+
+    def get(self, request):
+        etablissements = User.objects.filter(role='etablissement')
+        data = [
+            {
+                "id": e.id,
+                "email": e.email,
+                "username": e.username,
+            }
+            for e in etablissements
+        ]
+        return Response(data)   
+
+class EtablissementDeleteView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminRole]
+
+    def delete(self, request, pk):
+        etab = get_object_or_404(User, pk=pk, role='etablissement')
+        etab.delete()
+        return Response({"status": "deleted"}, status=status.HTTP_200_OK)
