@@ -48,6 +48,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     ROLE_CHOICES = (
         ("participant", "Participant"),
         ("admin", "Admin"),
+        ("etablissement", "Etablissement"),  # 👈 AJOUTER
     )
 
     role = models.CharField(
