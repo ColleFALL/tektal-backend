@@ -46,7 +46,7 @@ urlpatterns = [
     path('api/users/connected/', api_views.ConnectedUsersView.as_view(), name='users-connected'),
     path('api/users/<int:pk>/delete/', api_views.UserDeleteView.as_view(), name='user-delete'),
     path('api/users/<int:pk>/toggle-admin/', api_views.UserToggleAdminView.as_view(), name='user-toggle-admin'),
-    path('api/users/<int:pk>/toggle-role/', api_views.UserToggleRoleView.as_view(), name='user-toggle-role'),
+    # path('api/users/<int:pk>/toggle-role/', api_views.UserToggleRoleView.as_view(), name='user-toggle-role'),
 
     # Admin / Setup
     path('api/admin/login/', api_views.AdminLoginView.as_view(), name='admin-login'),
