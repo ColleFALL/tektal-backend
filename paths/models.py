@@ -146,7 +146,9 @@ class Path(models.Model):
     establishment = models.ForeignKey(
         Establishment,
         on_delete=models.CASCADE,
-        related_name='paths'
+        related_name='paths',
+        null=True,
+        blank=True
     )
 
     title = models.CharField(max_length=255)
