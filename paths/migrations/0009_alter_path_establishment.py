@@ -6,9 +6,9 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-    ('paths', '0007_alter_establishment_created_by'),
-    ]
+   dependencies = [
+    ('paths', '0008_establishment'),
+ ]
 
     operations = [
         migrations.AddField(
