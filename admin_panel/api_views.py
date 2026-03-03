@@ -286,12 +286,6 @@
 #         etab.delete()
 #         return Response({"status": "deleted"}, status=status.HTTP_200_OK)
 
-
-
-
-
-
-
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -299,7 +293,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.contrib.auth import authenticate, get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
-from paths.models import Path
+from paths.models import Path, Establishment
 from .permissions import IsAdminRole
 
 User = get_user_model()
@@ -319,7 +313,7 @@ class AdminLoginView(APIView):
         if user is None:
             return Response({"error": "Identifiants incorrects."}, status=status.HTTP_401_UNAUTHORIZED)
 
-        if not user.is_staff and getattr(user, "role", None) not in ["admin", "etablissement"]:
+        if getattr(user, "role", None) not in ["admin", "etablissement"]:
             return Response({"error": "Acces reserve aux administrateurs ou etablissement."}, status=status.HTTP_403_FORBIDDEN)
 
         refresh = RefreshToken.for_user(user)
@@ -385,11 +379,15 @@ class PathListView(APIView):
                 "status": path.status,
                 "author": path.user.username,
                 "author_role": path.user.role,
+                "establishment": path.establishment.name if path.establishment else None,
+                "establishment_id": path.establishment.id if path.establishment else None,
                 "video_url": path.video_url,
                 "duration": path.duration,
                 "is_official": path.is_official,
-                "start_label": path.start_label,
-                "end_label": path.end_label,
+                "start_lat": str(path.start_lat) if path.start_lat else None,
+                "start_lng": str(path.start_lng) if path.start_lng else None,
+                "end_lat": str(path.end_lat) if path.end_lat else None,
+                "end_lng": str(path.end_lng) if path.end_lng else None,
                 "created_at": str(path.created_at),
                 "steps": steps_data,
             })
@@ -415,11 +413,10 @@ class PathDetailView(APIView):
             "title": path.title,
             "status": path.status,
             "author": path.user.username,
+            "establishment": path.establishment.name if path.establishment else None,
             "video_url": path.video_url,
             "duration": path.duration,
             "is_official": path.is_official,
-            "start_label": path.start_label,
-            "end_label": path.end_label,
             "created_at": str(path.created_at),
             "steps": steps_data,
         })
@@ -457,8 +454,7 @@ class PublicPathListAPI(APIView):
                 "video_url": p.video_url,
                 "duration": p.duration,
                 "is_official": p.is_official,
-                "start_label": p.start_label,
-                "end_label": p.end_label,
+                "establishment": p.establishment.name if p.establishment else None,
                 "author": p.user.username,
             }
             for p in paths
@@ -511,10 +507,7 @@ class UserToggleAdminView(APIView):
 
         role = request.data.get("role")
         if role not in ["admin", "etablissement", "participant"]:
-            return Response(
-                {"error": "Role invalide."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
+            return Response({"error": "Role invalide."}, status=status.HTTP_400_BAD_REQUEST)
 
         user.role = role
         user.is_staff = True if role == "admin" else False
@@ -533,12 +526,18 @@ class EtablissementListView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
     def get(self, request):
-        etablissements = User.objects.filter(role='etablissement')
+        # ✅ Utilise le modèle Establishment de paths
+        etablissements = Establishment.objects.all().order_by('-created_at')
         data = [
             {
                 "id": e.id,
-                "email": e.email,
-                "username": e.username,
+                "name": e.name,
+                "lat": str(e.lat) if e.lat else None,
+                "lng": str(e.lng) if e.lng else None,
+                "user_email": e.created_by.email,
+                "username": e.created_by.username,
+                "created_at": str(e.created_at),
+                "total_paths": e.paths.count(),
             }
             for e in etablissements
         ]
@@ -549,8 +548,8 @@ class EtablissementDeleteView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
     def delete(self, request, pk):
-        etab = get_object_or_404(User, pk=pk, role='etablissement')
-        etab.delete()
+        etab = get_object_or_404(Establishment, pk=pk)
+        etab.created_by.delete()  # supprime aussi le user
         return Response({"status": "deleted"}, status=status.HTTP_200_OK)
 
 
@@ -559,8 +558,12 @@ class EtablissementPathListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        # Retourne les chemins créés par cet établissement
-        paths = Path.objects.filter(user=request.user).order_by('-created_at')
+        try:
+            establishment = request.user.establishment
+        except:
+            return Response({"error": "Etablissement non trouve."}, status=404)
+
+        paths = Path.objects.filter(establishment=establishment).order_by('-created_at')
         data = []
         for path in paths:
             steps_data = [
@@ -579,8 +582,10 @@ class EtablissementPathListView(APIView):
                 "author": path.user.username,
                 "video_url": path.video_url,
                 "duration": path.duration,
-                "start_label": path.start_label,
-                "end_label": path.end_label,
+                "start_lat": str(path.start_lat) if path.start_lat else None,
+                "start_lng": str(path.start_lng) if path.start_lng else None,
+                "end_lat": str(path.end_lat) if path.end_lat else None,
+                "end_lng": str(path.end_lng) if path.end_lng else None,
                 "created_at": str(path.created_at),
                 "steps": steps_data,
             })
@@ -592,7 +597,12 @@ class EtablissementPathApproveView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        path = get_object_or_404(Path, pk=pk, user=request.user)
+        try:
+            establishment = request.user.establishment
+        except:
+            return Response({"error": "Etablissement non trouve."}, status=404)
+
+        path = get_object_or_404(Path, pk=pk, establishment=establishment)
         path.status = "published"
         path.save()
         return Response({"status": "published"})
@@ -603,7 +613,12 @@ class EtablissementPathRejectView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, pk):
-        path = get_object_or_404(Path, pk=pk, user=request.user)
+        try:
+            establishment = request.user.establishment
+        except:
+            return Response({"error": "Etablissement non trouve."}, status=404)
+
+        path = get_object_or_404(Path, pk=pk, establishment=establishment)
         path.status = "hidden"
         path.save()
         return Response({"status": "hidden"})
