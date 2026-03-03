@@ -7,7 +7,6 @@ class Migration(migrations.Migration):
     dependencies = [
         ('paths', '0008_establishment'),
     ]
-
     operations = [
         migrations.AddField(
             model_name='path',
