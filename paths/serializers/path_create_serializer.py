@@ -1,113 +1,23 @@
-
-
-# from rest_framework import serializers
-# from django.db import transaction
-# from paths.models import Path, Step
-# from paths.serializers.gps_serializer import GPSPointSerializer
-
-
-# class StepSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Step
-#         fields = ['id', 'step_number', 'start_time', 'end_time', 'text', 'created_at']
-
-
-# class PathCreateSerializer(serializers.ModelSerializer):
-#     steps = StepSerializer(many=True)
-#     gps_points = GPSPointSerializer(many=True, required=False)
-
-#     class Meta:
-#         model = Path
-#         fields = [
-#             'id',
-#             'share_token',
-#             'title',
-#             'start_label',
-#             'end_label',
-#             'start_lat',
-#             'start_lng',
-#             'end_lat',
-#             'end_lng',
-#             'video_url',
-#             'duration',
-#             'is_official',
-#             'status',
-#             'created_at',
-#             'steps',
-#             'gps_points',
-#         ]
-#         read_only_fields = ['id', 'share_token', 'status', 'is_official', 'created_at']
-
-#     def validate_duration(self, value):
-#         if value > 120:
-#             raise serializers.ValidationError("La durée de la vidéo ne doit pas dépasser 120 secondes.")
-#         if value <= 0:
-#             raise serializers.ValidationError("La durée de la vidéo doit être supérieure à 0.")
-#         return value
-
-#     def validate(self, data):
-#         steps = data.get('steps', [])
-#         duration = data.get('duration')
-
-#         if not (2 <= len(steps) <= 6):
-#             raise serializers.ValidationError("Un chemin doit contenir entre 2 et 6 étapes.")
-
-#         for step in steps:
-#             if step['start_time'] >= step['end_time']:
-#                 raise serializers.ValidationError("Le start_time doit être inférieur au end_time.")
-#             if duration and step['end_time'] > duration:
-#                 raise serializers.ValidationError("Une étape ne peut pas dépasser la durée totale.")
-
-#         return data
-
-#     @transaction.atomic
-#     def create(self, validated_data):
-#         steps_data = validated_data.pop('steps', [])
-
-#         # author et status sont injectés par perform_create dans la vue
-#         path = Path.objects.create(**validated_data)
-#     @transaction.atomic
-#     def create(self, validated_data):
-#         steps_data = validated_data.pop('steps', [])
-#         gps_points_data = validated_data.pop('gps_points', [])
-
-#         path = Path.objects.create(**validated_data)
-
-# #         for step_data in steps_data:
-# #             Step.objects.create(path=path, **step_data)
-
-# #         return path
-#         for gps_data in gps_points_data:
-#             path.gps_points.create(**gps_data)
-
-#         return path
 from rest_framework import serializers
 from django.db import transaction
-from paths.models import Path, Step, GPSPoint
+from paths.models import Path, Step, GPSPoint, Establishment
 from paths.serializers.step_serializer import StepSerializer
 from paths.serializers.gps_serializer import GPSPointSerializer
 
-
-
 MAX_VIDEO_DURATION = 120
-
 
 class PathCreateSerializer(serializers.ModelSerializer):
     steps = StepSerializer(many=True)
-    gps_points = GPSPointSerializer(many=True, required=False)  # ✅ GPS optionnel
+    gps_points = GPSPointSerializer(many=True, required=False)
 
-    start_lat = serializers.DecimalField(
-        max_digits=9, decimal_places=6, required=False, allow_null=True
-    )
-    start_lng = serializers.DecimalField(
-        max_digits=9, decimal_places=6, required=False, allow_null=True
-    )
-    end_lat = serializers.DecimalField(
-        max_digits=9, decimal_places=6, required=False, allow_null=True
-    )
-    end_lng = serializers.DecimalField(
-        max_digits=9, decimal_places=6, required=False, allow_null=True
-    )
+    # Départ : soit label soit coordonnées
+    start_label = serializers.CharField(required=False, allow_blank=True)
+    start_lat = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
+    start_lng = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
+
+    # Destination : sera calculée à partir de l'établissement lié
+    end_lat = serializers.DecimalField(max_digits=9, decimal_places=6, read_only=True)
+    end_lng = serializers.DecimalField(max_digits=9, decimal_places=6, read_only=True)
 
     class Meta:
         model = Path
@@ -115,7 +25,6 @@ class PathCreateSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'start_label',
-            'end_label',
             'start_lat',
             'start_lng',
             'end_lat',
@@ -126,34 +35,31 @@ class PathCreateSerializer(serializers.ModelSerializer):
             'is_official',
             'created_at',
             'steps',
-            'gps_points',  # ✅ GPS inclus
+            'gps_points',
         ]
-        read_only_fields = ['status', 'is_official', 'created_at']
-
-    def validate_duration(self, value):
-        if value > MAX_VIDEO_DURATION:
-            raise serializers.ValidationError(
-                f"La durée de la vidéo ne peut pas dépasser {MAX_VIDEO_DURATION} secondes."
-            )
-        if value <= 0:
-            raise serializers.ValidationError(
-                "La durée doit être supérieure à 0."
-            )
-        return value
+        read_only_fields = ['status', 'is_official', 'created_at', 'end_lat', 'end_lng']
 
     def validate(self, data):
+        # Vérifier que le départ est renseigné
+        start_label = data.get('start_label')
+        start_lat = data.get('start_lat')
+        start_lng = data.get('start_lng')
+
+        if not start_label and (start_lat is None or start_lng is None):
+            raise serializers.ValidationError(
+                "Vous devez renseigner soit start_label, soit start_lat et start_lng pour le départ."
+            )
+
+        # Vérification des étapes
         steps = data.get('steps', [])
         duration = data.get('duration')
-
         if not (2 <= len(steps) <= 6):
-            raise serializers.ValidationError(
-                "Un chemin doit contenir entre 2 et 6 étapes."
-            )
+            raise serializers.ValidationError("Un chemin doit contenir entre 2 et 6 étapes.")
 
         for step in steps:
             if step['start_time'] >= step['end_time']:
                 raise serializers.ValidationError(
-                    "Le start_time doit être inférieur au end_time."
+                    "start_time doit être inférieur à end_time pour chaque étape."
                 )
             if duration and step['end_time'] > duration:
                 raise serializers.ValidationError(
@@ -165,26 +71,33 @@ class PathCreateSerializer(serializers.ModelSerializer):
     @transaction.atomic
     def create(self, validated_data):
         steps_data = validated_data.pop('steps', [])
-        gps_points_data = validated_data.pop('gps_points', [])  # ✅ récupère GPS
+        gps_points_data = validated_data.pop('gps_points', [])
         user = self.context['request'].user
+
+        # ✅ Récupérer l'établissement de l'utilisateur
+        establishment = getattr(user, 'etablissement', None)
 
         path = Path.objects.create(
             user=user,
+            establishment=establishment,
             status='draft',
             is_official=False,
+            # ✅ Copier les champs de départ
             **validated_data
         )
 
-        # ✅ Créer les steps
+        # ✅ Remplir les coordonnées de destination si l'établissement existe
+        if establishment:
+            path.end_lat = establishment.lat
+            path.end_lng = establishment.lng
+            path.save(update_fields=['end_lat', 'end_lng'])
+
+        # Créer les étapes
         for step_data in steps_data:
             Step.objects.create(path=path, **step_data)
 
-        # ✅ Créer les points GPS avec ordre automatique
+        # Créer les points GPS
         for index, gps_data in enumerate(gps_points_data):
-            GPSPoint.objects.create(
-                path=path,
-                order=index,
-                **gps_data
-            )
+            GPSPoint.objects.create(path=path, order=index, **gps_data)
 
         return path
