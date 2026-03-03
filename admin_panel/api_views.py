@@ -93,6 +93,7 @@ class PathListView(APIView):
                 "title": path.title,
                 "status": path.status,
                 "author": path.user.username,
+                "author_role": path.user.role,  # ✅ ajoute le rôle de l'auteur
                 "video_url": path.video_url,
                 "duration": path.duration,
                 "is_official": path.is_official,
