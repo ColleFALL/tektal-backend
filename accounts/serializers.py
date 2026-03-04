@@ -65,7 +65,7 @@ class UserSerializer(BaseUserSerializer):
         read_only_fields = ("id", "is_active", "date_joined")
 
     def get_establishment_name(self, obj):
-        establishment = getattr(obj, 'etablissement', None)
-        if establishment:
-            return establishment.name
+    try:
+        return obj.establishment.name  # related_name = 'establishment' dans paths/models.py
+    except:
         return None

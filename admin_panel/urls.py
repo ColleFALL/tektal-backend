@@ -55,4 +55,11 @@ urlpatterns = [
     # Etablissements
     path('api/etablissements/', api_views.EtablissementListView.as_view(), name='etablissements-list'),
     path('api/etablissements/<int:pk>/delete/', api_views.EtablissementDeleteView.as_view(), name='etablissement-delete'),
+
+    # ✅ Ajouter ici
+    path('api/etablissement/profile/', api_views.EtablissementProfileView.as_view(), name='etablissement-profile'),
+    path('api/etablissement/paths/', api_views.EtablissementPathListView.as_view(), name='etablissement-paths'),
+    path('api/etablissement/paths/approve/<int:pk>/', api_views.EtablissementPathApproveView.as_view(), name='etablissement-path-approve'),
+    path('api/etablissement/paths/reject/<int:pk>/', api_views.EtablissementPathRejectView.as_view(), name='etablissement-path-reject'),
+    path('api/users/<int:pk>/toggle-etablissement/', api_views.UserToggleEtablissementView.as_view(), name='user-toggle-etablissement'),
 ]
