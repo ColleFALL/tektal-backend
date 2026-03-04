@@ -234,20 +234,25 @@ class UserToggleAdminView(APIView):
     def post(self, request, pk):
         user = get_object_or_404(User, pk=pk)
 
+        # Impossible de modifier le superadmin
         if user.is_superuser:
             return Response(
                 {"error": "Impossible de modifier le superadmin."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
-        # 🔹 Récupérer le rôle choisi depuis le frontend
+        # Récupérer le rôle choisi depuis le frontend
         role = request.data.get("role")  # "admin", "establishment" ou "participant"
         if role not in ["admin", "etablissement", "participant"]:
-            return Response({"error": "Rôle invalide"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({"error": "Rôle invalide. Choisir 'admin', 'establishment' ou 'participant'."}, 
+             status=status.HTTP_400_BAD_REQUEST)
 
+        # Mettre à jour le rôle
         user.role = role
+
         # is_staff uniquement pour admin
         user.is_staff = True if role == "admin" else False
+
         user.save()
 
         return Response({
@@ -257,3 +262,26 @@ class UserToggleAdminView(APIView):
             "role": user.role,
             "is_staff": user.is_staff
         })
+
+class EtablissementListView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminRole]  # ou IsAdminRole si seulement admin peut voir
+
+    def get(self, request):
+        etablissements = User.objects.filter(role='etablissement')
+        data = [
+            {
+                "id": e.id,
+                "email": e.email,
+                "username": e.username,
+            }
+            for e in etablissements
+        ]
+        return Response(data)   
+
+class EtablissementDeleteView(APIView):
+    permission_classes = [IsAuthenticated, IsAdminRole]
+
+    def delete(self, request, pk):
+        etab = get_object_or_404(User, pk=pk, role='etablissement')
+        etab.delete()
+        return Response({"status": "deleted"}, status=status.HTTP_200_OK)
