@@ -46,7 +46,7 @@ class UserCreateSerializer(BaseUserCreateSerializer):
         fields = ("id", "email", "name", "password", "role")
         extra_kwargs = {
             "password": {"write_only": True},
-            "name": {"required": False},
+            "name": {"required": True},
             "role": {"required": False},
         }
 
