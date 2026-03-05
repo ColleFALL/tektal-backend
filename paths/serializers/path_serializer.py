@@ -65,34 +65,27 @@ class StepSerializer(serializers.ModelSerializer):
 
 class PathSerializer(serializers.ModelSerializer):
     steps = StepSerializer(many=True, read_only=True)
-
-    # Champs calculés depuis l'établissement lié
-    end_lat = serializers.SerializerMethodField()
-    end_lng = serializers.SerializerMethodField()
+    user = serializers.SerializerMethodField()
 
     class Meta:
         model = Path
         fields = [
             'id', 'share_token', 'title',
-            'start_label', 'end_label',
+            'start_label',
             'start_lat', 'start_lng', 'end_lat', 'end_lng',
             'video_url', 'duration', 'is_official', 'status', 'created_at',
-            'steps',
+            'user', 'steps',
         ]
         read_only_fields = [
             'id', 'share_token', 'status', 'is_official', 'created_at',
-            'end_lat', 'end_lng',
         ]
 
-    def get_end_lat(self, obj):
-        if obj.establishment and obj.establishment.lat is not None:
-            return obj.establishment.lat
-        return obj.end_lat
-
-    def get_end_lng(self, obj):
-        if obj.establishment and obj.establishment.lng is not None:
-            return obj.establishment.lng
-        return obj.end_lng
+    def get_user(self, obj):
+        return {
+            'id': obj.user.id,
+            'name': getattr(obj.user, 'name', '') or getattr(obj.user, 'full_name', ''),
+            'email': obj.user.email,
+        }
 
     def validate_duration(self, value):
         if value > 120:
