@@ -380,23 +380,26 @@ class EtablissementPathRejectView(APIView):
         path.save()
         return Response({"status": "hidden"})
 
-# TOGGLE ETABLISSEMENT ROLE
+
+ # Toggle Etablissement
 class UserToggleEtablissementView(APIView):
     permission_classes = [IsAuthenticated, IsAdminRole]
 
     def post(self, request, pk):
         user = get_object_or_404(User, pk=pk)
 
+        # Empêche de modifier le superadmin
         if user.is_superuser:
             return Response(
                 {"error": "Impossible de modifier le superadmin."},
                 status=status.HTTP_403_FORBIDDEN
             )
 
+        # Si c’est déjà un établissement → basculer en participant
         if user.role == "etablissement":
             user.role = "participant"
             user.is_staff = False
-        else:
+        else:  # Sinon → passer en établissement
             user.role = "etablissement"
             user.is_staff = False
 
@@ -406,5 +409,5 @@ class UserToggleEtablissementView(APIView):
             "email": user.email,
             "username": user.username,
             "role": user.role,
-        })        
+        })
 
