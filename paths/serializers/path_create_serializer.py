@@ -25,6 +25,7 @@ class PathCreateSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'start_label',
+            'end_label',        # ✅ ajout
             'start_lat',
             'start_lng',
             'end_lat',
