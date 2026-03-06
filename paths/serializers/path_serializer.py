@@ -20,7 +20,7 @@ class PathSerializer(serializers.ModelSerializer):
         model = Path
         fields = [
             'id', 'share_token', 'title',
-            'start_label', 'end_label',        # ✅ ajout
+            'start_label',        # ✅ ajout
             'start_lat', 'start_lng', 'end_lat', 'end_lng',
             'video_url', 'duration', 'is_official', 'status', 'created_at',
             'steps', 'gps_points'
