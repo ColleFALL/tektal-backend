@@ -23,10 +23,27 @@ class PathCreateView(generics.CreateAPIView):
     serializer_class = PathCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    # def perform_create(self, serializer):
+    #     user = self.request.user
+    #     establishment = getattr(user, 'etablissement', None)
+    #     serializer.save(user=user, establishment=establishment)
     def perform_create(self, serializer):
-        user = self.request.user
-        establishment = getattr(user, 'etablissement', None)
-        serializer.save(user=user, establishment=establishment)
+    user = self.request.user
+    
+    # Si établissement → lier automatiquement
+    establishment = getattr(user, 'etablissement', None)
+    
+    # Si admin → récupérer l'establishment_id envoyé dans la requête
+    if not establishment and user.is_staff:
+        from paths.models import Establishment
+        establishment_id = self.request.data.get('establishment')
+        if establishment_id:
+            try:
+                establishment = Establishment.objects.get(id=establishment_id)
+            except Establishment.DoesNotExist:
+                establishment = None
+
+    serializer.save(user=user, establishment=establishment)
 
 
 # 🔹 Liste des chemins
