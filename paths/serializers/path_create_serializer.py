@@ -69,10 +69,14 @@ class PathCreateSerializer(serializers.ModelSerializer):
         steps_data = validated_data.pop('steps', [])
         gps_points_data = validated_data.pop('gps_points', [])
         validated_data.pop('user', None)
-        validated_data.pop('establishment', None)
+
+        # ✅ Récupérer l'establishment passé depuis perform_create
+        establishment = validated_data.pop('establishment', None)
         user = self.context['request'].user
 
-        establishment = getattr(user, 'etablissement', None)
+        # ✅ Si pas d'establishment (cas établissement connecté)
+        if not establishment:
+            establishment = getattr(user, 'etablissement', None)
 
         path = Path.objects.create(
             user=user,
