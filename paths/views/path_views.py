@@ -1,8 +1,7 @@
-
 from rest_framework import generics, permissions
 from rest_framework.pagination import PageNumberPagination
 from django.db import models
-from paths.models import Path
+from paths.models import Path, Establishment
 from paths.serializers.path_create_serializer import PathCreateSerializer
 from paths.serializers.path_serializer import PathSerializer
 
@@ -23,37 +22,26 @@ class PathCreateView(generics.CreateAPIView):
     serializer_class = PathCreateSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    # def perform_create(self, serializer):
-    #     user = self.request.user
-    #     establishment = getattr(user, 'etablissement', None)
-    #     serializer.save(user=user, establishment=establishment)
     def perform_create(self, serializer):
-    user = self.request.user
-    
-    # Si établissement → lier automatiquement
-    establishment = getattr(user, 'etablissement', None)
-    
-    # Si admin → récupérer l'establishment_id envoyé dans la requête
-    if not establishment and user.is_staff:
-        from paths.models import Establishment
-        establishment_id = self.request.data.get('establishment')
-        if establishment_id:
-            try:
-                establishment = Establishment.objects.get(id=establishment_id)
-            except Establishment.DoesNotExist:
-                establishment = None
+        user = self.request.user
 
-    serializer.save(user=user, establishment=establishment)
+        # Si établissement → lier automatiquement
+        establishment = getattr(user, 'etablissement', None)
+
+        # Si admin → récupérer l'establishment_id envoyé dans la requête
+        if not establishment and user.is_staff:
+            establishment_id = self.request.data.get('establishment')
+            if establishment_id:
+                try:
+                    establishment = Establishment.objects.get(id=establishment_id)
+                except Establishment.DoesNotExist:
+                    establishment = None
+
+        serializer.save(user=user, establishment=establishment)
 
 
 # 🔹 Liste des chemins
 class PathListView(generics.ListAPIView):
-    """
-    Liste des chemins selon le rôle :
-    - Admin : tout voir
-    - Établissement : ses propres + publiés
-    - Participant/visiteur : seulement publiés
-    """
     serializer_class = PathSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     pagination_class = StandardResultsSetPagination
@@ -70,7 +58,6 @@ class PathListView(generics.ListAPIView):
         else:
             queryset = Path.objects.filter(status='published').order_by('-created_at')
 
-        # Filtre optionnel par établissement
         establishment_id = self.request.query_params.get('establishment_id')
         if establishment_id:
             queryset = queryset.filter(establishment_id=establishment_id)
@@ -80,11 +67,6 @@ class PathListView(generics.ListAPIView):
 
 # 🔹 Détail d'un chemin
 class PathDetailView(generics.RetrieveAPIView):
-    """
-    Détail d'un chemin selon le rôle :
-    - Participant/visiteur : seulement si status='published'
-    - Établissement/admin : tout voir
-    """
     serializer_class = PathSerializer
     permission_classes = [permissions.IsAuthenticatedOrReadOnly]
     lookup_field = 'id'
