@@ -15,5 +15,4 @@ urlpatterns = [
     path('users/me/favorites/', FavoriteListView.as_view(), name='user-favorites'),
     path('share/<uuid:share_token>/', SharePathView.as_view(), name='share-path'),
     path('establishments/', EstablishmentListView.as_view(), name='establishment-list'),
-
 ]
