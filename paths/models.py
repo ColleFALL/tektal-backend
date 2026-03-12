@@ -45,6 +45,7 @@ class Path(models.Model):
 
     title = models.CharField(max_length=255)
     start_label = models.CharField(max_length=255, null=True, blank=True)
+    end_label = models.CharField(max_length=255, null=True, blank=True)  # ✅ AJOUTER
 
 
     # Départ libre pour établissement ou participant (facultatif)
