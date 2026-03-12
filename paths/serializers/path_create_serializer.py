@@ -112,7 +112,8 @@ class PathCreateSerializer(serializers.ModelSerializer):
     gps_points = GPSPointSerializer(many=True, required=False)
     
     start_label = serializers.CharField(required=False, allow_blank=True)
-    
+    establishment_id = serializers.IntegerField(required=False, allow_null=True)  # ✅ ajout
+
     start_lat = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
     start_lng = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
     
@@ -126,6 +127,7 @@ class PathCreateSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'start_label',
+            'establishment_id',
             'start_lat',
             'start_lng',
             'end_lat',
@@ -174,11 +176,14 @@ class PathCreateSerializer(serializers.ModelSerializer):
         gps_points_data = validated_data.pop('gps_points', [])
         validated_data.pop('user', None)
 
-        establishment = validated_data.pop('establishment', None)
-        user = self.context['request'].user
+        user = self.context['request'].user  # ✅ ajout
+        validated_data.pop('establishment', None)
+        establishment_id = validated_data.pop('establishment_id', None)
 
-        if not establishment:
-            establishment = getattr(user, 'etablissement', None)
+        if establishment_id:
+         establishment = Establishment.objects.filter(id=establishment_id).first()
+        else:
+          establishment = getattr(user, 'etablissement', None)
 
         # ✅ Coordonnées envoyées par le mobile
         mobile_end_lat = validated_data.get('end_lat')
@@ -189,8 +194,10 @@ class PathCreateSerializer(serializers.ModelSerializer):
             establishment=establishment,
             status='draft',
             is_official=False,
+            end_label=establishment.name if establishment else "",
             **validated_data
         )
+
 
         # ✅ Fallback : coordonnées de l'établissement si mobile n'a pas envoyé
         if (mobile_end_lat is None or mobile_end_lng is None) and establishment:

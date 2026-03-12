@@ -15,12 +15,14 @@ class PathSerializer(serializers.ModelSerializer):
     # Champs calculés pour la destination automatique
     end_lat = serializers.SerializerMethodField()
     end_lng = serializers.SerializerMethodField()
+    end_label = serializers.SerializerMethodField()  # ✅ ici
 
     class Meta:
         model = Path
         fields = [
             'id', 'share_token', 'title',
             'start_label',        # ✅ ajout
+            'end_label',
             'start_lat', 'start_lng', 'end_lat', 'end_lng',
             'video_url', 'duration', 'is_official', 'status', 'created_at',
             'steps', 'gps_points'
@@ -38,6 +40,11 @@ class PathSerializer(serializers.ModelSerializer):
         if obj.establishment and obj.establishment.lng is not None:
             return obj.establishment.lng
         return None
+        
+    def get_end_label(self, obj):  # ✅ ici
+    if obj.establishment:
+        return obj.establishment.name
+    return None
 
     def validate_duration(self, value):
         if value > 120:
