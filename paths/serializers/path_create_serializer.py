@@ -6,12 +6,13 @@ from paths.serializers.gps_serializer import GPSPointSerializer
 
 MAX_VIDEO_DURATION = 120
 
+
 class PathCreateSerializer(serializers.ModelSerializer):
     steps = StepSerializer(many=True)
     gps_points = GPSPointSerializer(many=True, required=False)
     
     start_label = serializers.CharField(required=False, allow_blank=True)
-    end_label = serializers.CharField(required=False, allow_blank=True)  # ✅ ajouté
+    end_label = serializers.CharField(required=False, allow_blank=True)  # ✅ AJOUTÉ
     
     start_lat = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
     start_lng = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
@@ -25,7 +26,7 @@ class PathCreateSerializer(serializers.ModelSerializer):
             'id',
             'title',
             'start_label',
-            'end_label',
+            'end_label',  # ✅ AJOUTÉ
             'start_lat',
             'start_lng',
             'end_lat',
@@ -40,16 +41,16 @@ class PathCreateSerializer(serializers.ModelSerializer):
         ]
         read_only_fields = ['status', 'is_official', 'created_at']
 
-    def validate(self, data):
-        start_label = data.get('start_label')
-        start_lat = data.get('start_lat')
-        start_lng = data.get('start_lng')
-
-        if not start_label and (start_lat is None or start_lng is None):
+    def validate_duration(self, value):
+        if value > MAX_VIDEO_DURATION:
             raise serializers.ValidationError(
-                "Vous devez renseigner soit start_label, soit start_lat et start_lng pour le départ."
+                f"La durée ne peut pas dépasser {MAX_VIDEO_DURATION} secondes."
             )
+        if value <= 0:
+            raise serializers.ValidationError("La durée doit être supérieure à 0.")
+        return value
 
+    def validate(self, data):
         steps = data.get('steps', [])
         duration = data.get('duration')
 
@@ -58,13 +59,9 @@ class PathCreateSerializer(serializers.ModelSerializer):
 
         for step in steps:
             if step['start_time'] >= step['end_time']:
-                raise serializers.ValidationError(
-                    "start_time doit être inférieur à end_time pour chaque étape."
-                )
+                raise serializers.ValidationError("Le start_time doit être inférieur au end_time.")
             if duration and step['end_time'] > duration:
-                raise serializers.ValidationError(
-                    "Une étape ne peut pas dépasser la durée totale de la vidéo."
-                )
+                raise serializers.ValidationError("Une étape ne peut pas dépasser la durée totale.")
 
         return data
 
