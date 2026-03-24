@@ -9,6 +9,8 @@ urlpatterns = [
     path('api/paths/approve/<int:pk>/', api_views.PathApproveView.as_view(), name='paths-approve'),
     path('api/paths/reject/<int:pk>/', api_views.PathRejectView.as_view(), name='paths-reject'),
     path('api/paths/<int:pk>/', api_views.PathDetailView.as_view(), name='paths-detail'),
+    path('api/paths/<int:pk>/delete/', api_views.PathDeleteView.as_view(), name='path-delete'),
+    path('api/paths/<int:pk>/hide/', api_views.PathHideView.as_view(), name='path-hide'),
 
     # USERS
     path('api/users/connected/', api_views.ConnectedUsersView.as_view(), name='users-connected'),
@@ -28,4 +30,6 @@ urlpatterns = [
     path('api/etablissement/paths/', api_views.EtablissementPathListView.as_view(), name='etablissement-paths'),
     path('api/etablissement/paths/approve/<int:pk>/', api_views.EtablissementPathApproveView.as_view(), name='etablissement-path-approve'),
     path('api/etablissement/paths/reject/<int:pk>/', api_views.EtablissementPathRejectView.as_view(), name='etablissement-path-reject'),
+    path('api/etablissement/paths/<int:pk>/delete/', api_views.EtablissementPathDeleteView.as_view(), name='etablissement-path-delete'),
+    path('api/etablissement/paths/<int:pk>/hide/', api_views.EtablissementPathHideView.as_view(), name='etablissement-path-hide'), 
 ]

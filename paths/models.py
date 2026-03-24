@@ -3,7 +3,7 @@ from django.db import models
 from django.conf import settings
 import uuid
 
-# 🔹 Modèle des établissements
+#  Modèle des établissements
 class Establishment(models.Model):
     name = models.CharField(max_length=255)  # Nom obligatoire à l'inscription
     lat = models.DecimalField(max_digits=9, decimal_places=6, null=True, blank=True)  # Coordonnées facultatives
@@ -19,7 +19,7 @@ class Establishment(models.Model):
         return self.name
 
 
-# 🔹 Chemins (Paths)
+# Chemins (Paths)
 class Path(models.Model):
     STATUS_CHOICES = (
         ('draft', 'Draft'),
@@ -45,7 +45,7 @@ class Path(models.Model):
 
     title = models.CharField(max_length=255)
     start_label = models.CharField(max_length=255, null=True, blank=True)
-    end_label = models.CharField(max_length=255, null=True, blank=True)  # ✅ AJOUTER
+    end_label = models.CharField(max_length=255, null=True, blank=True)  #  AJOUTER
 
 
     # Départ libre pour établissement ou participant (facultatif)
@@ -75,7 +75,7 @@ class Path(models.Model):
         return f"{self.title} ({self.establishment})"
 
 
-# 🔹 Étapes d’un chemin
+#  Étapes d’un chemin
 class Step(models.Model):
     path = models.ForeignKey(
         Path,
@@ -97,7 +97,7 @@ class Step(models.Model):
         return f"Step {self.step_number} - {self.path.title}"
 
 
-# 🔹 Chemins sauvegardés par un participant
+#  Chemins sauvegardés par un participant
 class SavedPath(models.Model):
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -118,7 +118,7 @@ class SavedPath(models.Model):
         return f"{self.user} -> {self.path.title}"
 
 
-# 🔹 Points GPS
+#  Points GPS
 class GPSPoint(models.Model):
     path = models.ForeignKey(
         Path,
