@@ -40,6 +40,7 @@ class AdminLoginView(APIView):
                 "email": user.email,
                 "username": user.username,
                 "is_staff": user.is_staff,
+                "is_superuser": user.is_superuser,  # ✅ AJOUTÉ
                 "role": getattr(user, "role", "participant"),
             }
         }, status=status.HTTP_200_OK)
@@ -186,6 +187,7 @@ class ConnectedUsersView(APIView):
                 "username": user.username,
                 "email": user.email,
                 "role": getattr(user, "role", "user"),
+                "is_superuser": user.is_superuser,  # ✅ AJOUTÉ
             }
             for user in users
         ]
