@@ -296,7 +296,6 @@ SITE_NAME=TEKTAL
 
 EMAIL_HOST_USER= # <metter votre mail de configuration ici>
 EMAIL_HOST_PASSWORD=# <metter ici le mot de pass>
-
 ---
 
 ##  Sécurité
