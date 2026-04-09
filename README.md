@@ -49,7 +49,7 @@ tektal-backend/
 ### 1. Cloner le projet
 
 ```bash
-git clone https://github.com/ton-repo/tektal-backend.git
+git clone (https://github.com/ColleFALL/tektal-backend.git)
 cd tektal-backend
 ```
 
