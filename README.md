@@ -265,39 +265,6 @@ python manage.py test
 
 ---
 
-##  `.env.example`
-
-# ======================
-# DJANGO
-# ======================
-DJANGO_SECRET_KEY=#<metter votre secrt_key>
-DJANGO_DEBUG=True
-DJANGO_ALLOWED_HOSTS=127.0.0.1,localhost
-
-# ======================
-# DATABASE (LOCAL)
-# ======================
-# Utilisation SQLite en local
-# (DATABASE_URL vide = fallback SQLite)
-DATABASE_URL=
-
-# ======================
-# CLOUDINARY (LOCAL)
-# ======================
-CLOUDINARY_CLOUD_NAME=
-CLOUDINARY_API_KEY=
-CLOUDINARY_API_SECRET=
-
-BREVO_API_KEY=#< mettervotre api_key>
-DEFAULT_FROM_EMAIL=TEKTAL #<metter votre mail d' inscription brevo>
-DOMAIN=localhost:5173
-PROTOCOL=http
-SITE_NAME=TEKTAL
-
-EMAIL_HOST_USER= # <metter votre mail de configuration ici>
-EMAIL_HOST_PASSWORD=# <metter ici le mot de pass>
----
-
 ##  Sécurité
 
 * JWT Authentication
