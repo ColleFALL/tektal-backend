@@ -1,6 +1,6 @@
 #  TEKTAL — Backend
 
-Backend du projet **Tektal Web**, une plateforme permettant de créer, partager et suivre des chemins visuels (vidéo + étapes).
+Backend du projet **Tektal **, une application permettant de créer, partager et suivre des chemins visuels (vidéo + étapes).
 
 ---
 
