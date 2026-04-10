@@ -277,7 +277,10 @@ python manage.py test
 ##  Déploiement
 
 Le backend peut être déployé facilement sur des plateformes cloud comme **Render** ou **Railway**.
-C'est la branche develop qui est deploie pour ce projet 
+---
+## Déploiement  du projet 
+
+On a déployé la branche develop et tout le travail est regrouper sur ce branche. 
 ---
 
 ###  Déploiement avec Render 
