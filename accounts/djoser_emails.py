@@ -1,3 +1,4 @@
+
 # from djoser import email
 # from core.emailer import send_brevo_email
 # from django.core.mail.backends.base import BaseEmailBackend
@@ -5,23 +6,15 @@
 
 
 # class BrevoAPIEmailBackend(BaseEmailBackend):
-#     """
-#     Backend Django Email -> Brevo API.
-#     Djoser l'utilise pour activation + reset password.
-#     """
-
 #     def send_messages(self, email_messages):
 #         sent_count = 0
-
 #         for message in email_messages:
 #             to_emails = list(message.to) if message.to else []
 #             if not to_emails:
 #                 continue
-
 #             subject = message.subject or ""
 #             body_html = message.alternatives[0][0] if getattr(message, "alternatives", None) else None
 #             html_content = body_html or (message.body or "")
-
 #             for to_email in to_emails:
 #                 send_brevo_email(
 #                     to_email=to_email,
@@ -29,7 +22,6 @@
 #                     html_content=html_content,
 #                 )
 #                 sent_count += 1
-
 #         return sent_count
 
 
@@ -37,17 +29,10 @@
 #     def send(self, to, *args, **kwargs):
 #         to_email = to[0] if isinstance(to, (list, tuple)) else to
 #         context = self.get_context_data()
-        
-#         # ✅ CORRECTION : Récupérer uid et token séparément
 #         uid = context.get('uid')
 #         token = context.get('token')
-        
-#         # ✅ CORRECTION : Construire le lien frontend avec query parameters
 #         frontend_url = getattr(settings, 'FRONTEND_URL', 'https://active-tektal.vercel.app')
 #         link = f"{frontend_url}/activate.html?uid={uid}&token={token}"
-
-#         # link = f"{frontend_url}/activate?uid={uid}&token={token}"
-
 #         html = f"""
 #         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
 #           <h2>Activation de votre compte TEKTAL</h2>
@@ -62,7 +47,6 @@
 #           <p>Si vous n'êtes pas à l'origine de cette inscription, ignorez cet email.</p>
 #         </div>
 #         """
-
 #         send_brevo_email(
 #             to_email=to_email,
 #             subject="Activation de compte – TEKTAL",
@@ -74,23 +58,10 @@
 #     def send(self, to, *args, **kwargs):
 #         to_email = to[0] if isinstance(to, (list, tuple)) else to
 #         context = self.get_context_data()
-        
-#         # # ✅ CORRECTION : Récupérer uid et token séparément
-#         # uid = context.get('uid')
-#         # token = context.get('token')
-        
-#         # # ✅ CORRECTION : Construire le lien frontend avec query parameters
-#         # webapp_url = getattr(settings, 'WEBAPP_URL', 'https://tektal-web-appli.vercel.app')
-#         # link = f"{webapp_url}/reset-password.html?uid={uid}&token={token}"
-#         # ✅ CORRECTION : Récupérer uid et token séparément
-#          uid = context.get('uid')
-#          token = context.get('token')
-
-#        # ✅ CORRECTION : Construire le lien frontend avec query parameters
+#         uid = context.get('uid')
+#         token = context.get('token')
 #         frontend_url = getattr(settings, 'FRONTEND_URL', 'https://active-tektal.vercel.app')
 #         link = f"{frontend_url}/reset-password.html?uid={uid}&token={token}"
-
-
 #         html = f"""
 #         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
 #           <h2>Réinitialisation de mot de passe</h2>
@@ -105,7 +76,6 @@
 #           <p>Si ce n'est pas vous, ignorez cet email.</p>
 #         </div>
 #         """
-
 #         send_brevo_email(
 #             to_email=to_email,
 #             subject="Mot de passe oublié – TEKTAL",
@@ -143,8 +113,18 @@ class ActivationEmail(email.ActivationEmail):
         context = self.get_context_data()
         uid = context.get('uid')
         token = context.get('token')
-        frontend_url = getattr(settings, 'FRONTEND_URL', 'https://active-tektal.vercel.app')
-        link = f"{frontend_url}/activate.html?uid={uid}&token={token}"
+        user = context.get('user')
+
+        # ✅ Détecter la source : web ou mobile
+        source = getattr(user, '_registration_source', 'mobile')
+
+        if source == 'web':
+            base_url = getattr(settings, 'WEB_ACTIVATION_URL', 'http://localhost:5173')
+            link = f"{base_url}/activate?uid={uid}&token={token}"
+        else:
+            base_url = getattr(settings, 'FRONTEND_URL', 'https://active-tektal.vercel.app')
+            link = f"{base_url}/activate.html?uid={uid}&token={token}"
+
         html = f"""
         <div style="font-family: Arial, sans-serif; line-height: 1.6;">
           <h2>Activation de votre compte TEKTAL</h2>
