@@ -28,6 +28,12 @@ class Path(models.Model):
         ('deleted', 'Deleted'),
     )
 
+    # ✅ AJOUT — source de création du chemin (mobile ou web)
+    PLATFORM_CHOICES = (
+        ('mobile', 'Mobile'),
+        ('web', 'Web'),
+    )
+
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,
@@ -66,6 +72,16 @@ class Path(models.Model):
         max_length=10,
         choices=STATUS_CHOICES,
         default='draft'
+    )
+
+    # ✅ AJOUT — champ platform pour distinguer mobile et web
+    # null=True, blank=True pour ne pas casser les données existantes (mobile)
+    platform = models.CharField(
+        max_length=10,
+        choices=PLATFORM_CHOICES,
+        default='mobile',
+        null=True,
+        blank=True
     )
 
     share_token = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)

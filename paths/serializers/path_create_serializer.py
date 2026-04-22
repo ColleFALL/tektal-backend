@@ -129,6 +129,16 @@ class PathCreateSerializer(serializers.ModelSerializer):
     end_lat = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
     end_lng = serializers.DecimalField(max_digits=9, decimal_places=6, required=False, allow_null=True)
 
+    # ✅ AJOUT — champ platform optionnel, défaut 'mobile' pour ne pas casser l'app mobile
+    platform = serializers.ChoiceField(
+        choices=['mobile', 'web'],
+        required=False,
+        default='mobile'
+    )
+    # ✅ AJOUT — establishment_id optionnel pour la version web (admin panel)
+    establishment_id = serializers.IntegerField(required=False, allow_null=True)
+
+
     class Meta:
         model = Path
         fields = [
@@ -147,6 +157,9 @@ class PathCreateSerializer(serializers.ModelSerializer):
             'created_at',
             'steps',
             'gps_points',
+            # ✅ AJOUT
+            'platform',
+            'establishment_id',
         ]
         read_only_fields = ['status', 'is_official', 'created_at']
 
@@ -180,9 +193,20 @@ class PathCreateSerializer(serializers.ModelSerializer):
         gps_points_data = validated_data.pop('gps_points', [])
         validated_data.pop('user', None)
 
-        establishment = validated_data.pop('establishment', None)
+        # ✅ AJOUT — récupère platform (mobile par défaut, ne casse pas l'app mobile)
+        platform = validated_data.pop('platform', 'mobile')
+
+        # ✅ AJOUT — récupère establishment_id si envoyé (depuis version web)
+        establishment_id = validated_data.pop('establishment_id', None)
+
         user = self.context['request'].user
 
+        # ✅ MODIFIÉ — cherche l'établissement par establishment_id (web)
+        # ou par le compte utilisateur (mobile/établissement) — ordre de priorité :
+        # 1. establishment_id explicite (envoyé par le panel admin ou la version web)
+        # 2. établissement lié au compte utilisateur (mobile établissement)
+        establishment = validated_data.pop('establishment', None)
+    
         if not establishment:
             establishment = getattr(user, 'etablissement', None)
 
@@ -204,6 +228,7 @@ class PathCreateSerializer(serializers.ModelSerializer):
             establishment=establishment,
             status=status,
             is_official=is_official,
+            platform=platform,#Ajout✅
             **validated_data
         )
 
