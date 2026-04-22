@@ -15,6 +15,9 @@ class PathSerializer(serializers.ModelSerializer):
     end_lng = serializers.SerializerMethodField()
     end_label = serializers.SerializerMethodField()
 
+    # ✅ AJOUT — expose le champ platform dans la réponse API
+    platform = serializers.CharField(read_only=True) 
+
     class Meta:
         model = Path
         fields = [
@@ -22,6 +25,7 @@ class PathSerializer(serializers.ModelSerializer):
             'start_label', 'end_label',
             'start_lat', 'start_lng', 'end_lat', 'end_lng',
             'video_url', 'duration', 'is_official', 'status', 'created_at',
+            'platform',  # ✅ AJOUT
             'steps', 'gps_points'
         ]
         read_only_fields = ['id', 'share_token', 'status', 'is_official', 'created_at', 'end_lat', 'end_lng']
