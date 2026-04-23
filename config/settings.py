@@ -178,7 +178,7 @@ PROTOCOL = os.environ.get("PROTOCOL", ("https" if not DEBUG else "http"))
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://active-tektal.vercel.app")
 WEBAPP_URL = os.environ.get("WEBAPP_URL", "https://tektal-web-appli.vercel.app")
 
-# ✅ NOUVEAU — URL d'activation web
+#  NOUVEAU — URL d'activation web
 WEB_ACTIVATION_URL = os.environ.get(
     "WEB_ACTIVATION_URL",
     "http://localhost:5173" if DEBUG else "https://tektal-frontend.vercel.app"
@@ -217,7 +217,7 @@ BREVO_API_KEY = os.environ.get("BREVO_API_KEY")
 # =========================
 CORS_ALLOWED_ORIGINS = os.environ.get(
     "CORS_ALLOWED_ORIGINS",
-    "http://localhost:5173,http://localhost:3000,https://active-tektal.vercel.app,https://tektal-web-appli.vercel.app,https://tektal-administration.vercel.app,https://tektal-backend.onrender.com,https://tektal-frontend.vercel.app"
+    "http://localhost:5173,http://localhost:3000,https://active-tektal.vercel.app,https://tektal-web-appli.vercel.app,https://tektal-administration.vercel.app,https://tektal-backend.onrender.com,https://tektal-frontend.vercel.app,https://tektal-frontend-dpbb.vercel.app"
 ).split(",")
 CORS_ALLOWED_ORIGINS
 
@@ -229,6 +229,7 @@ CSRF_TRUSTED_ORIGINS = [
     "https://active-tektal.vercel.app",
     "https://tektal-administration.vercel.app",
     "https://tektal-frontend.vercel.app", 
+    "https://tektal-frontend-dpbb.vercel.app",
 
 ]
 # =========================
